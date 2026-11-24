@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#050907" />
+  <title>CRTMatrix — Masuki Dimensi Digital</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #050907;
+      --panel: rgba(8, 19, 13, .82);
+      --green: #67ff9a;
+      --muted: #91a99a;
+      --line: rgba(103, 255, 154, .22);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background: var(--bg);
+      color: #e4ffec;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    #matrix {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      opacity: .24;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 3;
+      pointer-events: none;
+      opacity: .13;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent 3px,
+        rgba(0, 0, 0, .45) 4px
+      );
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .container {
+      width: min(1120px, calc(100% - 40px));
+      margin: auto;
+    }
+
+    header {
+      height: 82px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .logo {
+      color: var(--green);
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: .12em;
+    }
+
+    .logo span { color: #e4ffec; }
+
+    nav { display: flex; gap: 30px; color: var(--muted); font-size: .85rem; }
+    nav a:hover { color: var(--green); }
+
+    .status {
+      color: var(--green);
+      font-size: .75rem;
+      letter-spacing: .08em;
+    }
+
+    .status::before {
+      content: "";
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      margin-right: 9px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 12px var(--green);
+    }
+
+    main { position: relative; z-index: 1; }
+
+    .hero {
+      min-height: 690px;
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      align-items: center;
+      gap: 60px;
+      padding: 80px 0;
+    }
+
+    .eyebrow {
+      color: var(--green);
+      font-size: .78rem;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 720px;
+      margin: 20px 0;
+      font-size: clamp(3rem, 7vw, 6.4rem);
+      line-height: .98;
+      letter-spacing: -.08em;
+    }
+
+    h1 span {
+      color: var(--green);
+      text-shadow: 0 0 24px rgba(103, 255, 154, .45);
+    }
+
+    .intro {
+      max-width: 540px;
+      color: var(--muted);
+      font-family: system-ui, sans-serif;
+      font-size: 1.05rem;
+      line-height: 1.8;
+    }
+
+    .actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 32px; }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 20px;
+      border: 1px solid var(--green);
+      color: var(--bg);
+      background: var(--green);
+      font: inherit;
+      font-size: .85rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: .2s ease;
+    }
+
+    .button:hover { box-shadow: 0 0 25px rgba(103, 255, 154, .35); transform: translateY(-2px); }
+
+    .button.secondary { color: var(--green); background: transparent; }
+    .button.secondary:hover { background: rgba(103, 255, 154, .08); }
+
+    .terminal {
+      min-height: 360px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      box-shadow: 0 0 70px rgba(0, 255, 100, .07), inset 0 0 35px rgba(0, 255, 100, .025);
+      transform: perspective(900px) rotateY(-5deg);
+    }
+
+    .terminal-top {
+      display: flex;
+      justify-content: space-between;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      font-size: .72rem;
+    }
+
+    .terminal-body { padding-top: 22px; color: var(--muted); font-size: .85rem; line-height: 2; }
+    .terminal-body .green { color: var(--green); }
+    .terminal-body .dim { color: #506b59; }
+    .cursor { animation: blink 1s steps(2, start) infinite; }
+
+    @keyframes blink { to { visibility: hidden; } }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      padding: 0 0 90px;
+    }
+
+    .feature {
+      padding: 24px;
+      border: 1px solid var(--line);
+      background: rgba(8, 19, 13, .65);
+    }
+
+    .feature .number { color: var(--green); font-size: .75rem; }
+    .feature h2 { margin: 18px 0 10px; font-size: 1rem; }
+    .feature p { margin: 0; color: var(--muted); font: .9rem/1.7 system-ui, sans-serif; }
+
+    footer {
+      padding: 24px 0;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: .75rem;
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    @media (max-width: 760px) {
+      nav { display: none; }
+      .hero { grid-template-columns: 1fr; gap: 38px; min-height: auto; padding: 80px 0; }
+      .terminal { transform: none; }
+      .features { grid-template-columns: 1fr; padding-bottom: 55px; }
+      footer { flex-direction: column; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="matrix" aria-hidden="true"></canvas>
+
+  <div class="container">
+    <header>
+      <a class="logo" href="#" aria-label="CRTMatrix beranda">CRT<span>Matrix</span></a>
+      <nav aria-label="Navigasi utama">
+        <a href="#tentang">Tentang</a>
+        <a href="#fitur">Fitur</a>
+        <a href="mailto:hello@crtmatrix.dev">Kontak</a>
+      </nav>
+      <div class="status">SISTEM ONLINE</div>
+    </header>
+
+    <main>
+      <section class="hero" id="tentang">
+        <div>
+          <div class="eyebrow">[ Selamat datang di CRTMatrix ]</div>
+          <h1>Masuki<br />dimensi <span>digital.</span></h1>
+          <p class="intro">
+            Ruang untuk menjelajahi teknologi, kreativitas, dan ide-ide baru.
+            CRTMatrix adalah titik awal perjalananmu di dunia digital.
+          </p>
+          <div class="actions">
+            <a class="button" href="#fitur">JELAJAHI SEKARANG&nbsp; ↗</a>
+            <a class="button secondary" href="mailto:hello@crtmatrix.dev">HUBUNGI KAMI</a>
+          </div>
+        </div>
+
+        <div class="terminal" aria-label="Tampilan terminal CRTMatrix">
+          <div class="terminal-top">
+            <span>CRT_MATRIX://WELCOME</span>
+            <span>v1.0.0</span>
+          </div>
+          <div class="terminal-body">
+            <div><span class="green">user@crtmatrix</span>:~$ initialize</div>
+            <div class="dim">Memuat antarmuka...</div>
+            <div class="dim">Menghubungkan ke jaringan...</div>
+            <div class="green">Koneksi berhasil.</div>
+            <br />
+            <div>Selamat datang, pengunjung.</div>
+            <div>Ide besar dimulai dari sini.</div>
+            <br />
+            <div><span class="green">user@crtmatrix</span>:~$ <span class="cursor">▌</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="features" id="fitur" aria-label="Keunggulan CRTMatrix">
+        <article class="feature">
+          <div class="number">01 / EKSPLORASI</div>
+          <h2>Jelajahi kemungkinan</h2>
+          <p>Temukan perspektif dan inspirasi baru di dalam ekosistem digital.</p>
+        </article>
+        <article class="feature">
+          <div class="number">02 / KREATIVITAS</div>
+          <h2>Bangun ide bersama</h2>
+          <p>Ubah gagasan menjadi sesuatu yang nyata melalui kreativitas dan teknologi.</p>
+        </article>
+        <article class="feature">
+          <div class="number">03 / KONEKSI</div>
+          <h2>Terhubung lebih jauh</h2>
+          <p>Jadilah bagian dari perjalanan menuju masa depan digital.</p>
+        </article>
+      </section>
+    </main>
+
+    <footer>
+      <span>© <span id="year"></span> CRTMatrix. Hak cipta dilindungi.</span>
+      <span>DIRANCANG UNTUK EKSPLORASI DIGITAL</span>
+    </footer>
+  </div>
+
+  <script>
+    const canvas = document.querySelector("#matrix");
+    const context = canvas.getContext("2d");
+    const characters = "アイウエオカキクケコサシスセソタチツテト0123456789";
+    const fontSize = 15;
+    let columns = 0;
+    let drops = [];
+
+    function resizeCanvas() {
+      const ratio = window.devicePixelRatio || 1;
+      canvas.width = window.innerWidth * ratio;
+      canvas.height = window.innerHeight * ratio;
+      canvas.style.width = `${window.innerWidth}px`;
+      canvas.style.height = `${window.innerHeight}px`;
+      context.setTransform(ratio, 0, 0, ratio, 0, 0);
+      columns = Math.ceil(window.innerWidth / fontSize);
+      drops = Array(columns).fill(1);
+    }
+
+    function drawMatrix() {
+      context.fillStyle = "rgba(5, 9, 7, 0.08)";
+      context.fillRect(0, 0, window.innerWidth, window.innerHeight);
+      context.fillStyle = "#67ff9a";
+      context.font = `${fontSize}px monospace`;
+
+      drops.forEach((y, index) => {
+        const character = characters[Math.floor(Math.random() * characters.length)];
+        context.fillText(character, index * fontSize, y * fontSize);
+
+        if (y * fontSize > window.innerHeight && Math.random() > 0.975) {
+          drops[index] = 0;
+        }
+        drops[index]++;
+      });
+    }
+
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+    window.setInterval(drawMatrix, 55);
+    document.querySelector("#year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
