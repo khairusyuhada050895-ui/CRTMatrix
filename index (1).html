@@ -1,0 +1,1757 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0B0F17">
+<title>CRTMatrix V16 PRO — Candle Range Theory BEI</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'%3E%3Crect width='36' height='36' rx='8' fill='%230D1A18'/%3E%3Crect x='7' y='13' width='3' height='8' rx='1' fill='%2310B981'/%3E%3Crect x='13' y='10' width='3' height='9' rx='1' fill='%2338BDF8'/%3E%3Crect x='19' y='12' width='3' height='7' rx='1' fill='%23F59E0B'/%3E%3Cpath d='M6 25C11 25 14 20 18 19C22 18 25 13 29 10' stroke='%2310B981' stroke-width='2.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace'],
+      }
+    }
+  }
+}
+</script>
+<style>
+body { background-color: #0B0F17; color: #F1F5F9; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: #0B0F17; }
+::-webkit-scrollbar-thumb { background: #1E293B; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #334155; }
+.tabular-nums { font-variant-numeric: tabular-nums; }
+@keyframes pulseSlow { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+.animate-pulse-slow { animation: pulseSlow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+</style>
+</head>
+<body class="min-h-screen antialiased selection:bg-emerald-500/30 selection:text-emerald-200">
+
+<div id="loginScreen" class="min-h-screen flex items-center justify-center p-4 bg-[#0B0F17]">
+<div class="w-full max-w-[450px] bg-[#111827] border border-[#1E293B] rounded-2xl p-6 sm:p-8 shadow-2xl shadow-black/60">
+<div class="flex flex-col items-center text-center mb-6">
+<div class="w-16 h-16 rounded-2xl bg-[#0D1A18] border border-emerald-500/30 flex items-center justify-center mb-4 shadow-lg shadow-emerald-500/10">
+<svg class="w-9 h-9" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="7" y="13" width="3" height="8" rx="1" fill="#10B981"/>
+<line x1="8.5" y1="10" x2="8.5" y2="23" stroke="#10B981" stroke-width="1.5"/>
+<rect x="13" y="10" width="3" height="9" rx="1" fill="#38BDF8"/>
+<line x1="14.5" y1="7" x2="14.5" y2="22" stroke="#38BDF8" stroke-width="1.5"/>
+<rect x="19" y="12" width="3" height="7" rx="1" fill="#F59E0B"/>
+<line x1="20.5" y1="9" x2="20.5" y2="21" stroke="#F59E0B" stroke-width="1.5"/>
+<path d="M6 25C11 25 14 20 18 19C22 18 25 13 29 10" stroke="#10B981" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M24.5 9.5H29.5V14.5" stroke="#10B981" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</div>
+<div class="flex items-center gap-2.5">
+<h1 class="text-2xl font-extrabold tracking-tight text-white">CRTMatrix</h1>
+<span class="px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">V16 PRO</span>
+</div>
+<p class="text-xs text-slate-400 mt-1.5 leading-relaxed">Candle Range Theory (Daily • Weekly • Monthly) — Bursa Efek Indonesia</p>
+<div class="mt-3 flex items-center gap-2">
+<span id="loginApiStatusBadge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">⚡ API Otomatis Aktif</span>
+<button type="button" onclick="toggleLoginApiPanel()" class="text-[11px] font-semibold text-sky-400 hover:text-sky-300 underline">Atur Otomatis / Manual</button>
+</div>
+</div>
+
+<div id="loginApiPanel" class="hidden mb-5 p-3.5 rounded-xl bg-[#0B0F17] border border-[#1E293B] space-y-2.5">
+<div class="flex items-center justify-between">
+<span class="text-[10px] font-bold uppercase tracking-wider text-slate-300">Endpoint Google Apps Script (/exec)</span>
+<button type="button" onclick="useAutoDefaultApiFromLogin()" class="text-[10px] font-bold text-emerald-400 hover:underline">⚡ Gunakan Otomatis</button>
+</div>
+<input type="url" id="loginApiUrlInput" placeholder="https://script.google.com/macros/s/.../exec" class="w-full px-3 py-2 rounded-lg bg-[#111827] border border-[#1E293B] text-[11px] font-mono text-white focus:outline-none focus:border-emerald-500">
+<div class="flex items-center justify-between gap-2">
+<button type="button" onclick="enterDemoMode()" class="px-3 py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 text-[11px] font-semibold transition">Masuk Mode Demo</button>
+<button type="button" onclick="saveApiUrlFromLogin()" class="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-[#06281E] text-[11px] font-bold transition">Simpan URL Manual</button>
+</div>
+</div>
+
+<div id="loginAlertBanner" class="hidden mb-5 p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/40 text-xs text-rose-200 flex items-start gap-2.5">
+<span class="text-rose-400 font-bold text-sm leading-none">⚠️</span>
+<span id="loginAlertText">Username atau password salah.</span>
+</div>
+
+<form id="loginForm" class="space-y-4">
+<div>
+<label for="username" class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Username</label>
+<input type="text" id="username" value="khairu" placeholder="Masukkan username..." required class="w-full px-4 py-3 rounded-xl bg-[#0B0F17] border border-[#1E293B] text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition">
+</div>
+<div>
+<label for="password" class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Password</label>
+<div class="relative">
+<input type="password" id="password" value="wakzel123" placeholder="••••••••" required class="w-full px-4 py-3 pr-24 rounded-xl bg-[#0B0F17] border border-[#1E293B] text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition">
+<button type="button" id="togglePasswordBtn" class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400 hover:text-white px-2 py-1 rounded">Lihat</button>
+</div>
+</div>
+<div class="flex items-center justify-between pt-0.5">
+<label class="inline-flex items-center gap-2 cursor-pointer select-none">
+<input type="checkbox" id="rememberMe" checked class="w-4 h-4 rounded border-slate-700 bg-[#0B0F17] text-emerald-500 focus:ring-emerald-500/30">
+<span class="text-xs text-slate-300">Ingat sesi login saya</span>
+</label>
+<button type="button" onclick="enterDemoMode()" class="text-xs text-slate-400 hover:text-emerald-400 transition">Demo Langsung →</button>
+</div>
+<button type="submit" class="w-full py-3.5 px-4 rounded-xl bg-[#10B981] hover:bg-emerald-400 active:scale-[0.99] text-[#06281E] font-bold text-sm transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20">
+<span>Masuk ke CRTMatrix</span>
+<span>→</span>
+</button>
+</form>
+</div>
+</div>
+
+<div id="dashboardScreen" class="hidden min-h-screen flex flex-col">
+<header class="border-b border-[#1E293B] bg-[#0B0F17]/95 backdrop-blur sticky top-0 z-30">
+<div class="max-w-[1600px] mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-[#0D1A18] border border-emerald-500/30 flex items-center justify-center shrink-0">
+<svg class="w-6 h-6" viewBox="0 0 36 36" fill="none">
+<rect x="7" y="13" width="3" height="8" rx="1" fill="#10B981"/>
+<rect x="13" y="10" width="3" height="9" rx="1" fill="#38BDF8"/>
+<rect x="19" y="12" width="3" height="7" rx="1" fill="#F59E0B"/>
+<path d="M6 25C11 25 14 20 18 19C22 18 25 13 29 10" stroke="#10B981" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M24.5 9.5H29.5V14.5" stroke="#10B981" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<span class="text-lg font-extrabold tracking-tight text-white">CRTMatrix</span>
+<span class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">V16 PRO</span>
+</div>
+<p class="text-[11px] text-slate-400 hidden sm:block">Candle Range Theory (Daily • Weekly • Monthly) — Bursa Efek Indonesia</p>
+</div>
+</div>
+
+<div class="flex flex-wrap items-center gap-2 sm:gap-2.5">
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#111827] border border-[#1E293B] text-xs font-mono">
+<span id="connDot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse-slow"></span>
+<span id="connSourceLabel" class="text-slate-400 hidden md:inline">TERHUBUNG (AUTO):</span>
+<span id="connRowCountText" class="text-emerald-400 font-bold">IDX_CRT_Engine</span>
+<span class="text-slate-600">•</span>
+<span class="text-slate-300">Sync <span id="syncTimeText">09.42.22</span></span>
+</div>
+<div class="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#111827] border border-[#1E293B] text-xs">
+<span id="memberGreetingText" class="font-semibold text-slate-200">Halo, Member</span>
+<span class="text-slate-600">|</span>
+<span id="memberExpiryText" class="font-mono text-[11px] text-emerald-400">Exp: 2027-12-31</span>
+</div>
+<button type="button" onclick="openApiConfigModal()" class="px-3 py-1.5 rounded-xl bg-[#111827] hover:bg-[#1A2234] border border-[#1E293B] text-xs font-semibold text-slate-200 transition flex items-center gap-1.5">
+<span>⚙️ API:</span>
+<span id="headerApiModeBadge" class="text-emerald-400 font-mono">AUTO</span>
+</button>
+<button type="button" onclick="refreshEngineData()" class="px-3.5 py-1.5 rounded-xl bg-[#0D211E] hover:bg-emerald-500/20 border border-emerald-500/35 text-xs font-semibold text-emerald-400 transition flex items-center gap-1.5">
+<svg id="refreshIcon" class="w-3.5 h-3.5 transition-transform duration-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+<path d="M21 12a9 9 0 1 1-2.64-6.36" stroke-linecap="round"/>
+<path d="M21 3v6h-6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<span>Refresh Data</span>
+</button>
+<button type="button" onclick="logoutApp()" class="px-3.5 py-1.5 rounded-xl bg-[#111827] hover:bg-rose-500/15 border border-[#1E293B] hover:border-rose-500/40 text-xs font-semibold text-slate-300 hover:text-rose-400 transition">Keluar</button>
+</div>
+</div>
+</header>
+
+<main class="flex-1 max-w-[1600px] w-full mx-auto px-4 sm:px-6 py-5 space-y-5">
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+<div class="bg-[#111827] border border-[#1E293B] rounded-2xl p-4 flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="text-xs font-medium text-slate-400">Total Sinyal Terdeteksi</span>
+<span class="w-7 h-7 rounded-lg bg-[#1A2234] border border-[#2A364F] flex items-center justify-center text-slate-400 text-xs">≡</span>
+</div>
+<div class="flex items-baseline justify-between mt-3">
+<span id="kpiTotal" class="text-2xl sm:text-3xl font-extrabold font-mono text-white tabular-nums">0</span>
+<span id="kpiTfBreakdown" class="text-[11px] font-mono text-slate-400">D:0 • W:0 • M:0</span>
+</div>
+</div>
+<div class="bg-[#0D1E1B] border border-emerald-500/35 rounded-2xl p-4 flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="text-xs font-semibold text-emerald-400">Setup OPEN (Aktif)</span>
+<span class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">LIVE</span>
+</div>
+<div class="flex items-baseline justify-between mt-3">
+<span id="kpiOpen" class="text-2xl sm:text-3xl font-extrabold font-mono text-emerald-400 tabular-nums">0</span>
+<span id="kpiOpenPct" class="text-xs font-mono text-slate-300">0% aktif</span>
+</div>
+</div>
+<div class="bg-[#111827] border border-[#1E293B] rounded-2xl p-4 flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="text-xs font-medium text-slate-400">Bullish CRT</span>
+<span class="text-[11px] font-mono text-emerald-400">Conf / Potensi</span>
+</div>
+<div class="flex items-baseline justify-between mt-3">
+<span id="kpiBull" class="text-2xl sm:text-3xl font-extrabold font-mono text-emerald-400 tabular-nums">0</span>
+<span id="kpiBullSplit" class="text-xs font-mono text-slate-400">0 / 0 pot</span>
+</div>
+</div>
+<div class="bg-[#111827] border border-[#1E293B] rounded-2xl p-4 flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="text-xs font-medium text-slate-400">Bearish CRT</span>
+<span class="text-[11px] font-mono text-rose-400">Conf / Potensi</span>
+</div>
+<div class="flex items-baseline justify-between mt-3">
+<span id="kpiBear" class="text-2xl sm:text-3xl font-extrabold font-mono text-rose-400 tabular-nums">0</span>
+<span id="kpiBearSplit" class="text-xs font-mono text-slate-400">0 / 0 pot</span>
+</div>
+</div>
+<div class="bg-[#111827] border border-[#1E293B] rounded-2xl p-4 flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="text-xs font-medium text-slate-400">Rata-rata Nilai 20D</span>
+<span class="text-[11px] font-semibold text-sky-400">Likuiditas</span>
+</div>
+<div class="flex items-baseline justify-between mt-3">
+<span id="kpiAvgVal" class="text-2xl sm:text-3xl font-extrabold font-mono text-sky-400 tabular-nums">Rp 0.0 M</span>
+<span class="text-[11px] text-slate-400">per hari</span>
+</div>
+</div>
+</section>
+
+<section class="bg-[#111827] border border-[#1E293B] rounded-2xl p-4 space-y-3">
+<div class="flex flex-wrap items-center gap-2.5">
+<div class="relative flex-1 min-w-[210px]">
+<span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs">🔍</span>
+<input type="text" id="searchInput" placeholder="CARI KODE (MIS. BBCA, BBRI, TLKM)..." class="w-full pl-9 pr-3.5 py-2 rounded-xl bg-[#0B0F17] border border-[#1E293B] text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition">
+</div>
+<div class="inline-flex items-center p-1 rounded-xl bg-[#0B0F17] border border-[#1E293B]">
+<button type="button" data-tf="ALL" class="tf-btn px-3 py-1.5 rounded-md text-xs font-bold bg-[#10B981] text-[#06281E] transition">ALL</button>
+<button type="button" data-tf="D" class="tf-btn px-3 py-1.5 rounded-md text-xs font-medium text-slate-400 hover:text-white transition">Daily (D)</button>
+<button type="button" data-tf="W" class="tf-btn px-3 py-1.5 rounded-md text-xs font-medium text-slate-400 hover:text-white transition">Weekly (W)</button>
+<button type="button" data-tf="M" class="tf-btn px-3 py-1.5 rounded-md text-xs font-medium text-slate-400 hover:text-white transition">Monthly (M)</button>
+</div>
+<select id="sectorFilter" class="px-3 py-2 rounded-xl bg-[#0B0F17] border border-[#1E293B] text-xs font-medium text-slate-200 focus:outline-none focus:border-emerald-500">
+<option value="ALL">Sektor: Semua</option>
+</select>
+<select id="signalFilter" class="px-3 py-2 rounded-xl bg-[#0B0F17] border border-[#1E293B] text-xs font-medium text-slate-200 focus:outline-none focus:border-emerald-500">
+<option value="ALL">Semua Sinyal CRT</option>
+<option value="POTENSI BULL CRT">⚡ POTENSI BULL CRT</option>
+<option value="POTENSI BULL (>50%)">⚡ POTENSI BULL (&gt;50%)</option>
+<option value="BULL CRT">BULL CRT</option>
+<option value="BULL (>50%)">BULL (&gt;50%)</option>
+<option value="BEAR CRT">BEAR CRT</option>
+<option value="BEAR (>50%)">BEAR (&gt;50%)</option>
+<option value="POTENSI BEAR CRT">⚡ POTENSI BEAR CRT</option>
+<option value="POTENSI BEAR (>50%)">⚡ POTENSI BEAR (&gt;50%)</option>
+<option value="DBL SWEEP">DBL SWEEP</option>
+</select>
+<select id="statusFilter" class="px-3 py-2 rounded-xl bg-[#0B0F17] border border-[#1E293B] text-xs font-medium text-slate-200 focus:outline-none focus:border-emerald-500">
+<option value="ALL">Status: Semua</option>
+<option value="OPEN">OPEN (Aktif)</option>
+<option value="TEMBUS">TEMBUS</option>
+</select>
+<select id="liquidityFilter" class="px-3 py-2 rounded-xl bg-[#0B0F17] border border-[#1E293B] text-xs font-medium text-slate-200 focus:outline-none focus:border-emerald-500">
+<option value="ALL">Likuiditas: Semua</option>
+<option value="100">&gt; Rp 100 M / hari</option>
+<option value="50">&gt; Rp 50 M / hari</option>
+<option value="10">&gt; Rp 10 M / hari</option>
+</select>
+<button type="button" onclick="resetFilters()" class="px-3.5 py-2 rounded-xl bg-[#1A2234] hover:bg-slate-700 border border-[#2A364F] text-xs font-semibold text-slate-200 transition">Reset</button>
+</div>
+
+<div class="flex flex-wrap items-center gap-1.5 pt-1 border-t border-[#1E293B]">
+<span class="text-[11px] text-slate-500 mr-1">Filter Cepat:</span>
+<button type="button" data-qsig="ALL" onclick="quickSelectSignal('ALL')" class="qsig-btn px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-[#0B0F17] text-slate-300 border border-[#1E293B] ring-2 ring-emerald-400">Semua</button>
+<button type="button" data-qsig="POTENSI BULL CRT" onclick="quickSelectSignal('POTENSI BULL CRT')" class="qsig-btn px-2.5 py-1 rounded-lg text-[11px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/40">⚡ POTENSI BULL CRT</button>
+<button type="button" data-qsig="POTENSI BULL (>50%)" onclick="quickSelectSignal('POTENSI BULL (>50%)')" class="qsig-btn px-2.5 py-1 rounded-lg text-[11px] font-bold bg-amber-400/15 text-amber-200 border border-amber-400/40">⚡ POTENSI BULL (&gt;50%)</button>
+<button type="button" data-qsig="BULL CRT" onclick="quickSelectSignal('BULL CRT')" class="qsig-btn px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">BULL CRT</button>
+<button type="button" data-qsig="BULL (>50%)" onclick="quickSelectSignal('BULL (>50%)')" class="qsig-btn px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">BULL (&gt;50%)</button>
+<button type="button" data-qsig="BEAR CRT" onclick="quickSelectSignal('BEAR CRT')" class="qsig-btn px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-rose-500/15 text-rose-400 border border-rose-500/30">BEAR CRT</button>
+<button type="button" data-qsig="BEAR (>50%)" onclick="quickSelectSignal('BEAR (>50%)')" class="qsig-btn px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-fuchsia-500/15 text-fuchsia-300 border border-fuchsia-500/30">BEAR (&gt;50%)</button>
+<button type="button" data-qsig="POTENSI BEAR CRT" onclick="quickSelectSignal('POTENSI BEAR CRT')" class="qsig-btn px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-orange-500/15 text-orange-300 border border-orange-500/30">⚡ POTENSI BEAR CRT</button>
+</div>
+</section>
+
+<div class="flex flex-wrap items-center justify-between gap-2 text-xs">
+<div class="text-slate-400">
+Menampilkan <strong id="shownCount" class="text-white font-mono">0</strong> dari <strong id="totalFilteredBase" class="text-white font-mono">0</strong> sinyal
+<span class="mx-1.5 text-slate-600">•</span>
+<button type="button" onclick="openFirstRowModal()" class="text-sky-400 hover:underline font-medium">Klik baris saham untuk membuka Visualizer C1 &amp; Kalkulator Lot BEI</button>
+</div>
+<div class="flex flex-wrap items-center gap-1.5">
+<span class="text-slate-500 mr-1">Urutkan:</span>
+<button type="button" data-sort="nilai20d" class="sort-btn px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/40 transition">Nilai 20D ↓</button>
+<button type="button" data-sort="keMid" class="sort-btn px-2.5 py-1 rounded-md text-xs font-medium bg-[#111827] text-slate-400 border border-[#1E293B] hover:text-white transition">Ke Mid</button>
+<button type="button" data-sort="umur" class="sort-btn px-2.5 py-1 rounded-md text-xs font-medium bg-[#111827] text-slate-400 border border-[#1E293B] hover:text-white transition">Umur</button>
+<button type="button" data-sort="tanggalC2" class="sort-btn px-2.5 py-1 rounded-md text-xs font-medium bg-[#111827] text-slate-400 border border-[#1E293B] hover:text-white transition">Tanggal C2</button>
+</div>
+</div>
+
+<section class="bg-[#111827] border border-[#1E293B] rounded-2xl overflow-hidden shadow-xl">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse whitespace-nowrap">
+<thead>
+<tr class="bg-[#0D131F] border-b border-[#1E293B] text-[11px] font-bold uppercase tracking-wider text-slate-400">
+<th class="py-3.5 px-4">KODE &amp; SEKTOR</th>
+<th class="py-3.5 px-3 text-center">TF</th>
+<th class="py-3.5 px-3">SINYAL</th>
+<th class="py-3.5 px-3">TANGGAL C2</th>
+<th class="py-3.5 px-2.5 text-right">UMUR</th>
+<th class="py-3.5 px-3 text-right">CRTH</th>
+<th class="py-3.5 px-3 text-right">CRTL</th>
+<th class="py-3.5 px-3 text-right">MID (50%)</th>
+<th class="py-3.5 px-3 text-right">MID (10%)</th>
+<th class="py-3.5 px-3 text-center">STOCHRSI (K/D)</th>
+<th class="py-3.5 px-3 text-right">RANGE C1</th>
+<th class="py-3.5 px-3 text-right">HARGA</th>
+<th class="py-3.5 px-3 text-right">KE MID</th>
+<th class="py-3.5 px-4 text-right">NILAI 20D (M)</th>
+<th class="py-3.5 px-4 text-center">STATUS</th>
+</tr>
+</thead>
+<tbody id="screenerTableBody" class="divide-y divide-[#1E293B]/70 text-xs font-mono">
+<tr><td colspan="15" class="py-12 text-center font-sans text-slate-400">Memuat data sinyal CRTMatrix V16...</td></tr>
+</tbody>
+</table>
+</div>
+<div class="px-4 py-3 bg-[#0D131F] border-t border-[#1E293B] flex flex-wrap items-center justify-between gap-2 text-xs">
+<span id="paginationInfo" class="text-slate-400 font-mono">Menampilkan 0 sinyal</span>
+<div class="flex items-center gap-2">
+<button type="button" id="toggleShowAllBtn" onclick="toggleShowAllRows()" class="px-3 py-1 rounded-lg bg-[#111827] hover:bg-[#1A2234] border border-[#1E293B] text-slate-300 font-medium transition">Tampilkan Semua</button>
+<button type="button" id="prevPageBtn" onclick="changePage(-1)" class="px-3 py-1 rounded-lg bg-[#111827] hover:bg-[#1A2234] disabled:opacity-40 border border-[#1E293B] text-slate-300 font-semibold transition">← Prev</button>
+<span id="pageIndicator" class="font-mono text-slate-300 px-1">Hal 1 / 1</span>
+<button type="button" id="nextPageBtn" onclick="changePage(1)" class="px-3 py-1 rounded-lg bg-[#111827] hover:bg-[#1A2234] disabled:opacity-40 border border-[#1E293B] text-slate-300 font-semibold transition">Next →</button>
+</div>
+</div>
+</section>
+</main>
+</div>
+
+<div id="stockModal" class="fixed inset-0 z-50 hidden items-center justify-center p-3 sm:p-5 bg-black/80 backdrop-blur-sm overflow-y-auto">
+<div class="bg-[#111827] border border-[#1E293B] rounded-2xl w-full max-w-5xl shadow-2xl overflow-hidden my-auto">
+<div class="px-5 py-4 bg-[#0D131F] border-b border-[#1E293B] flex flex-wrap items-center justify-between gap-3">
+<div class="flex items-center gap-3">
+<div id="modalTickerIcon" class="px-3 py-1.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 font-mono font-extrabold text-sm text-emerald-400">BBCA</div>
+<div>
+<div class="flex flex-wrap items-center gap-2">
+<h3 id="modalTitle" class="text-lg font-extrabold font-mono text-white">BBCA</h3>
+<span id="modalSector" class="px-2 py-0.5 rounded text-[11px] font-medium bg-sky-500/10 text-sky-400 border border-sky-500/20">Keuangan</span>
+<span id="modalTfBadge" class="px-2 py-0.5 rounded text-[11px] font-mono bg-slate-800 text-slate-300 border border-slate-700">Daily (D)</span>
+</div>
+<div class="flex flex-wrap items-center gap-2 mt-1">
+<span id="modalSignalBadge"></span>
+<span id="modalStatusBadge"></span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<div class="inline-flex items-center p-1 rounded-lg bg-[#0B0F17] border border-[#1E293B]">
+<button type="button" data-mtf="D" onclick="switchModalChartTf('D')" class="mtf-btn px-2.5 py-1 rounded text-xs font-bold bg-emerald-500 text-[#06281E]">D</button>
+<button type="button" data-mtf="W" onclick="switchModalChartTf('W')" class="mtf-btn px-2.5 py-1 rounded text-xs font-medium text-slate-400 hover:text-white">W</button>
+<button type="button" data-mtf="M" onclick="switchModalChartTf('M')" class="mtf-btn px-2.5 py-1 rounded text-xs font-medium text-slate-400 hover:text-white">M</button>
+</div>
+<button type="button" onclick="closeModal()" class="w-8 h-8 rounded-lg bg-[#1A2234] hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 flex items-center justify-center transition">✕</button>
+</div>
+</div>
+
+<div class="p-5 grid grid-cols-1 lg:grid-cols-12 gap-5">
+<div class="lg:col-span-7 space-y-4">
+<div class="bg-[#0B0F17] border border-[#1E293B] rounded-xl overflow-hidden">
+<div class="px-3.5 py-2 border-b border-[#1E293B] flex items-center justify-between text-[11px]">
+<span class="font-semibold text-slate-300">Candlestick Chart + Zona CRT &amp; SMA 20/50</span>
+<span id="chartSourceBadge" class="px-2 py-0.5 text-[10px] font-mono rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">OHLC Real IDX</span>
+</div>
+<div class="relative w-full h-[290px] sm:h-[330px]">
+<div id="chartLoadingOverlay" class="hidden absolute inset-0 z-10 bg-[#0B0F17]/80 flex items-center justify-center text-xs font-mono text-emerald-400">Memuat candlestick OHLC...</div>
+<div id="tvLightweightChart" class="w-full h-full"></div>
+</div>
+</div>
+
+<div class="bg-[#0B0F17] border border-[#1E293B] rounded-xl p-4 space-y-3">
+<div class="flex items-center justify-between text-xs">
+<span id="vizDatesLabel" class="font-mono text-slate-400">C1 → C2</span>
+<span class="text-slate-400">Posisi Harga di Zona C1: <strong id="vizPosPct" class="font-mono text-white">50%</strong></span>
+</div>
+<div class="relative h-3 rounded-full bg-slate-800 overflow-visible my-2">
+<div id="vizRangeFill" class="h-full rounded-full bg-gradient-to-r from-rose-500 via-amber-400 to-emerald-500" style="width: 50%"></div>
+<div id="vizMid10Pin" title="MID 10%" class="absolute -top-1 w-0.5 h-5 bg-yellow-300" style="left: 10%"></div>
+<div id="vizMid50Pin" title="MID 50%" class="absolute -top-1 w-0.5 h-5 bg-slate-300" style="left: 50%"></div>
+<div id="vizPriceDot" title="Harga Saat Ini" class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-white border-2 border-emerald-500 shadow" style="left: 50%"></div>
+</div>
+<div class="grid grid-cols-4 gap-2 text-center font-mono text-xs pt-1">
+<div class="p-2 rounded-lg bg-[#111827] border border-[#1E293B]"><div class="text-[10px] text-slate-500">CRTL</div><div id="vizCrtl" class="font-bold text-rose-400 mt-0.5">0</div></div>
+<div class="p-2 rounded-lg bg-[#111827] border border-[#1E293B]"><div class="text-[10px] text-slate-500">MID (10%)</div><div id="vizMid10" class="font-bold text-yellow-300 mt-0.5">0</div></div>
+<div class="p-2 rounded-lg bg-[#111827] border border-[#1E293B]"><div class="text-[10px] text-slate-500">MID (50%)</div><div id="vizMid50" class="font-bold text-amber-400 mt-0.5">0</div></div>
+<div class="p-2 rounded-lg bg-[#111827] border border-[#1E293B]"><div class="text-[10px] text-slate-500">CRTH</div><div id="vizCrth" class="font-bold text-emerald-400 mt-0.5">0</div></div>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-[#1E293B] text-xs font-mono">
+<div><span class="text-slate-500 text-[10px] block">SMA 20</span><span id="vizSma20" class="text-amber-400 font-semibold">-</span></div>
+<div><span class="text-slate-500 text-[10px] block">SMA 50</span><span id="vizSma50" class="text-sky-400 font-semibold">-</span></div>
+<div><span class="text-slate-500 text-[10px] block">RSI (14)</span><span id="vizRsi14" class="text-slate-200 font-semibold">-</span></div>
+<div><span class="text-slate-500 text-[10px] block">STOCHRSI</span><span id="vizStochKD" class="text-emerald-400 font-bold">-</span></div>
+</div>
+<div class="text-[11px] text-slate-400 flex items-center justify-between pt-1">
+<span>Konfluensi V16:</span>
+<span id="modalConfluenceText" class="font-semibold text-emerald-400">-</span>
+</div>
+</div>
+</div>
+
+<div class="lg:col-span-5 bg-[#0B0F17] border border-[#1E293B] rounded-xl p-4 flex flex-col justify-between space-y-4">
+<div class="space-y-3">
+<div class="flex items-center justify-between">
+<h4 class="text-xs font-bold uppercase tracking-wider text-white">Kalkulator Lot &amp; R:R BEI</h4>
+<span id="beiTickBadge" class="px-2 py-0.5 rounded text-[10px] font-mono bg-sky-500/15 text-sky-400 border border-sky-500/30">Fraksi BEI: Rp 5</span>
+</div>
+<div class="grid grid-cols-2 gap-2.5">
+<div>
+<label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Preset Titik Entry</label>
+<select id="rrEntryMode" onchange="applyEntryModePreset()" class="w-full px-2.5 py-2 rounded-lg bg-[#111827] border border-[#1E293B] text-xs text-slate-200 focus:outline-none focus:border-emerald-500">
+<option value="CURRENT">Harga Saat Ini</option>
+<option value="MID10">MID 10% (Retest)</option>
+<option value="EDGE">CRTL / CRTH Edge</option>
+</select>
+</div>
+<div>
+<label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Jumlah Lot (100 lbr)</label>
+<input type="number" id="calcLotInput" value="10" min="1" oninput="recalculateBEI()" class="w-full px-3 py-2 rounded-lg bg-[#111827] border border-[#1E293B] text-xs font-mono text-white focus:outline-none focus:border-emerald-500">
+</div>
+</div>
+<div class="grid grid-cols-2 gap-2.5">
+<div>
+<label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Harga Entry (Rp)</label>
+<input type="number" id="calcEntry" oninput="recalculateBEI()" class="w-full px-3 py-2 rounded-lg bg-[#111827] border border-[#1E293B] text-xs font-mono text-white focus:outline-none focus:border-emerald-500">
+</div>
+<div>
+<label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Buffer SL (Ticks)</label>
+<input type="number" id="calcSlBufferTicks" value="3" min="1" max="50" oninput="applySlBufferPreset()" class="w-full px-3 py-2 rounded-lg bg-[#111827] border border-[#1E293B] text-xs font-mono text-white focus:outline-none focus:border-emerald-500">
+</div>
+</div>
+<div class="grid grid-cols-2 gap-2.5">
+<div>
+<label class="block text-[10px] font-bold uppercase text-rose-400 mb-1">Stop Loss (Rp)</label>
+<input type="number" id="calcStopLoss" oninput="recalculateBEI()" class="w-full px-3 py-2 rounded-lg bg-[#111827] border border-rose-500/30 text-xs font-mono text-rose-300 focus:outline-none focus:border-rose-500">
+</div>
+<div>
+<div class="flex items-center justify-between mb-1">
+<label class="text-[10px] font-bold uppercase text-emerald-400">Target Profit (Rp)</label>
+<div class="flex gap-1">
+<button type="button" onclick="setTpLevel('MID50')" class="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300">50%</button>
+<button type="button" onclick="setTpLevel('CRTH')" class="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300">CRTH</button>
+<button type="button" onclick="setTpLevel('CRTL')" class="text-[9px] px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300">CRTL</button>
+</div>
+</div>
+<input type="number" id="calcTarget" oninput="recalculateBEI()" class="w-full px-3 py-2 rounded-lg bg-[#111827] border border-emerald-500/30 text-xs font-mono text-emerald-300 focus:outline-none focus:border-emerald-500">
+</div>
+</div>
+</div>
+
+<div class="p-3.5 rounded-xl bg-[#111827] border border-[#1E293B] space-y-2.5 font-mono text-xs">
+<div class="flex items-center justify-between">
+<span class="text-slate-400 font-sans">Total Modal Beli</span>
+<div class="text-right">
+<div id="resModalRp" class="font-bold text-white">Rp 0</div>
+<div id="resSharesText" class="text-[10px] text-slate-500">0 Lot (0 lembar)</div>
+</div>
+</div>
+<div class="flex items-center justify-between pt-2 border-t border-[#1E293B]">
+<span class="text-slate-400 font-sans">Risk : Reward Ratio</span>
+<span id="resRRRatio" class="px-2.5 py-0.5 rounded bg-amber-500/15 text-amber-300 font-bold">1 : 0.00</span>
+</div>
+<div class="grid grid-cols-2 gap-2 pt-2 border-t border-[#1E293B]">
+<div class="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/25">
+<div class="text-[10px] text-emerald-400 font-sans">Potensi Profit</div>
+<div id="resProfitRp" class="font-bold text-emerald-300 mt-0.5">+Rp 0</div>
+<div id="resProfitPct" class="text-[10px] text-emerald-400">+0.00%</div>
+</div>
+<div class="p-2 rounded-lg bg-rose-500/10 border border-rose-500/25">
+<div class="text-[10px] text-rose-400 font-sans">Potensi Risiko</div>
+<div id="resLossRp" class="font-bold text-rose-300 mt-0.5">-Rp 0</div>
+<div id="resLossPct" class="text-[10px] text-rose-400">-0.00%</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="px-5 py-3.5 bg-[#0D131F] border-t border-[#1E293B] flex flex-wrap items-center justify-between gap-2.5">
+<div class="flex flex-wrap items-center gap-2">
+<a id="btnTradingView" href="#" target="_blank" rel="noopener noreferrer" class="px-3.5 py-2 rounded-xl bg-[#1A2234] hover:bg-slate-700 border border-[#2A364F] text-xs font-semibold text-slate-200 transition">Chart TradingView ↗</a>
+<a id="btnStockbit" href="#" target="_blank" rel="noopener noreferrer" class="px-3.5 py-2 rounded-xl bg-[#0D211E] hover:bg-emerald-500/20 border border-emerald-500/30 text-xs font-semibold text-emerald-400 transition">Buka Stockbit ↗</a>
+</div>
+<div class="flex items-center gap-2.5">
+<button type="button" onclick="copyTradePlan()" class="px-4 py-2 rounded-xl bg-[#10B981] hover:bg-emerald-400 text-[#06281E] text-xs font-bold transition shadow-lg shadow-emerald-500/20">Salin Trade Plan</button>
+<button type="button" onclick="closeModal()" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition">Tutup</button>
+</div>
+</div>
+</div>
+</div>
+
+<div id="apiConfigModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/75 backdrop-blur-sm overflow-y-auto">
+<div class="bg-[#111827] border border-[#1E293B] rounded-2xl w-full max-w-xl p-6 shadow-2xl space-y-4 my-auto">
+<div class="flex items-center justify-between">
+<div>
+<h3 class="text-base font-bold text-white">Pengaturan Koneksi Data (Otomatis &amp; Manual)</h3>
+<p class="text-[11px] text-slate-400 mt-0.5">Pilih sinkronisasi otomatis ke GAS V16 atau kelola data secara manual.</p>
+</div>
+<button type="button" onclick="closeApiConfigModal()" class="w-8 h-8 rounded-lg bg-[#1A2234] text-slate-400 hover:text-white flex items-center justify-center">✕</button>
+</div>
+
+<div class="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+<div>
+<div class="flex items-center gap-2">
+<span class="text-xs font-bold text-emerald-400">⚡ Mode Otomatis (Default V16)</span>
+<span id="autoActivePill" class="px-2 py-0.5 text-[10px] font-mono rounded bg-emerald-500/20 text-emerald-300">AKTIF</span>
+</div>
+<p class="text-[11px] text-slate-300 mt-1">Tarik otomatis <code class="text-emerald-300">DATA_SCAN</code> &amp; chart real IDX dari endpoint Apps Script V16 bawaan.</p>
+</div>
+<button type="button" onclick="activateAutoDefaultApi()" class="px-3.5 py-2 rounded-xl bg-[#10B981] hover:bg-emerald-400 text-[#06281E] text-xs font-bold shrink-0 transition">Gunakan Otomatis</button>
+</div>
+
+<div class="p-3.5 rounded-xl bg-[#0B0F17] border border-[#1E293B] space-y-2.5">
+<label class="block text-[11px] font-bold uppercase tracking-wider text-slate-300">🔧 Versi Manual 1 — Custom URL Web App (/exec)</label>
+<input type="url" id="modalApiUrlInput" placeholder="https://script.google.com/macros/s/.../exec" class="w-full px-3.5 py-2 rounded-xl bg-[#111827] border border-[#1E293B] text-xs font-mono text-white focus:outline-none focus:border-emerald-500">
+<div class="flex justify-end">
+<button type="button" onclick="saveApiUrlFromModal()" class="px-3.5 py-1.5 rounded-lg bg-sky-500/20 hover:bg-sky-500/30 border border-sky-500/40 text-sky-300 text-xs font-semibold transition">Simpan &amp; Muat URL Manual</button>
+</div>
+</div>
+
+<div class="p-3.5 rounded-xl bg-[#0B0F17] border border-[#1E293B] space-y-2.5">
+<div class="flex items-center justify-between">
+<label class="block text-[11px] font-bold uppercase tracking-wider text-slate-300">📋 Versi Manual 2 — Tempel JSON (<code class="text-amber-300">?mode=scan</code>)</label>
+<a id="openRawScanLink" href="#" target="_blank" rel="noopener noreferrer" class="text-[11px] text-sky-400 hover:underline">Buka JSON di Tab Baru ↗</a>
+</div>
+<textarea id="manualJsonInput" rows="3" placeholder='Tempel output JSON dari URL ?mode=scan di sini jika ingin memuat data secara manual...' class="w-full px-3 py-2 rounded-xl bg-[#111827] border border-[#1E293B] text-[11px] font-mono text-slate-200 placeholder-slate-600 focus:outline-none focus:border-amber-500"></textarea>
+<div class="flex flex-wrap items-center justify-between gap-2">
+<button type="button" onclick="clearApiUrl()" class="px-3.5 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 text-xs font-semibold transition">Mode Demo Offline</button>
+<button type="button" onclick="loadManualJsonData()" class="px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-bold transition">Muat JSON Manual</button>
+</div>
+</div>
+</div>
+</div>
+
+<div id="toastContainer" class="fixed bottom-5 right-5 z-[60] flex flex-col gap-2 pointer-events-none"></div>
+<textarea id="clipboardHelper" class="sr-only" aria-hidden="true"></textarea>
+
+<script>
+const DEFAULT_GAS_API_URL = 'https://script.google.com/macros/s/AKfycbxcEHViN9NJeCypAaPvHOl18uK6KXahcDXPHCrE0Zgc-XOToX6_hq-2-pQQZp-gWGOm1Q/exec';
+const STORAGE_API_KEY     = 'crtmatrix_v16_gas_url';
+const STORAGE_API_MODE    = 'crtmatrix_v16_api_mode';
+const STORAGE_MANUAL_JSON = 'crtmatrix_v16_manual_json';
+const STORAGE_SESSION_KEY = 'crtmatrix_v16_session';
+
+const VALID_USERS = {
+  'khairu':   { password: 'wakzel123',   nama: 'Muhammad Khairu',   expired: '2027-12-31', role: 'ADMIN' },
+  'admin':    { password: 'crtmatrix16', nama: 'Admin CRTMatrix',   expired: '2027-12-31', role: 'ADMIN' },
+  'member01': { password: 'cuan2026',    nama: 'Member Trader BEI', expired: '2027-06-30', role: 'MEMBER' }
+};
+
+let apiMode        = 'AUTO';
+let gasApiUrl      = DEFAULT_GAS_API_URL;
+let currentSession = null;
+let allData        = [];
+let filteredData   = [];
+let currentTf      = 'ALL';
+let currentSort    = 'nilai20d';
+let sortAsc        = false;
+let currentPage    = 1;
+let pageSize       = 100;
+let showAllRows    = false;
+let selectedStock  = null;
+let modalChartTf   = 'D';
+let lwChart        = null;
+
+function getBEITickSize(price) {
+  const p = Number(price) || 0;
+  if (p < 200) return 1;
+  if (p < 500) return 2;
+  if (p < 2000) return 5;
+  if (p < 5000) return 10;
+  return 25;
+}
+
+function roundToBEITick(price) {
+  const p = Math.max(50, Number(price) || 50);
+  const tick = getBEITickSize(p);
+  return Math.round(p / tick) * tick;
+}
+
+function formatIDX(num) {
+  const n = Number(num);
+  if (isNaN(n)) return '0';
+  return Math.round(n).toLocaleString('en-US');
+}
+
+function formatCompactRp(val) {
+  const absVal = Math.abs(Number(val) || 0);
+  if (absVal >= 1e9) return (absVal / 1e9).toFixed(2) + ' M';
+  if (absVal >= 1e6) return (absVal / 1e6).toFixed(2) + ' Jt';
+  if (absVal >= 1e3) return (absVal / 1e3).toFixed(1) + ' Rb';
+  return Math.round(absVal).toLocaleString('en-US');
+}
+
+function updateSyncClock(customTimeStr) {
+  const el = document.getElementById('syncTimeText');
+  if (!el) return;
+  if (customTimeStr) {
+    el.textContent = customTimeStr;
+    return;
+  }
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2, '0');
+  const mm = String(now.getMinutes()).padStart(2, '0');
+  const ss = String(now.getSeconds()).padStart(2, '0');
+  el.textContent = `${hh}.${mm}.${ss}`;
+}
+
+function showToast(message, type) {
+  const container = document.getElementById('toastContainer');
+  if (!container) return;
+  const colors = {
+    success: 'bg-[#0D211E] border-emerald-500/40 text-emerald-300',
+    warning: 'bg-[#221A0D] border-amber-500/40 text-amber-300',
+    error:   'bg-[#231016] border-rose-500/40 text-rose-300',
+    info:    'bg-[#111827] border-sky-500/40 text-sky-300'
+  };
+  const cls = colors[type] || colors.info;
+  const toast = document.createElement('div');
+  toast.className = `pointer-events-auto px-4 py-2.5 rounded-xl border text-xs font-medium shadow-xl backdrop-blur transition-all duration-300 ${cls}`;
+  toast.textContent = message;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(6px)';
+    setTimeout(() => toast.remove(), 300);
+  }, 3400);
+}
+
+function enrichStockRow(id, raw) {
+  const ticker   = String(raw.TICKER || raw.ticker || 'BBCA').trim().toUpperCase();
+  const sector   = String(raw.SEKTOR || raw.sector || 'Keuangan').trim();
+  const tf       = String(raw.TF || raw.tf || 'D').trim().toUpperCase();
+  const signal   = String(raw.SINYAL || raw.signal || 'BULL CRT').trim();
+  const dateC1   = String(raw.TANGGAL_C1 || raw.dateC1 || '2026-11-24').trim();
+  const dateC2   = String(raw.TANGGAL_C2 || raw.dateC2 || '2026-11-26').trim();
+  const age      = Number(raw.UMUR ?? raw.age ?? 0) || 0;
+  const crth     = Number(raw.CRTH ?? raw.crth ?? 0) || 0;
+  const crtl     = Number(raw.CRTL ?? raw.crtl ?? 0) || 0;
+  const price    = Number(raw.HARGA ?? raw.price ?? 0) || 0;
+  const zRange   = Math.max(0, crth - crtl);
+  const mid50    = Number(raw.MID_50 ?? raw.mid50) || Math.round(crtl + zRange * 0.5);
+  const isBear   = signal.includes('BEAR');
+  const mid10    = Number(raw.MID_10 ?? raw.mid10) || Math.round(isBear ? (crth - zRange * 0.1) : (crtl + zRange * 0.1));
+  const rangePct = raw.RANGE_C1_PCT !== undefined
+    ? Number(raw.RANGE_C1_PCT)
+    : (raw.rangePct !== undefined ? Number(raw.rangePct) : (crtl > 0 ? Number(((zRange / crtl) * 100).toFixed(2)) : 0));
+  const keMidPct = price > 0
+    ? Number((((mid50 - price) / price) * 100).toFixed(2))
+    : Number(raw.KE_MID_PCT ?? raw.keMidPct ?? 0);
+  const nilai20d = Number(raw.NILAI_20D_M ?? raw.nilai20d ?? 0) || 0;
+  const status   = String(raw.STATUS || raw.status || 'OPEN').trim().toUpperCase();
+  const sma20    = Number(raw.SMA_20 ?? raw.sma20 ?? 0) || 0;
+  const sma50    = Number(raw.SMA_50 ?? raw.sma50 ?? 0) || 0;
+  const rsi14    = Number(raw.RSI_14 ?? raw.rsi14 ?? 50) || 50;
+  const stochK   = Number(raw.STOCH_K ?? raw.stochK ?? 50) || 50;
+  const stochD   = Number(raw.STOCH_D ?? raw.stochD ?? 50) || 50;
+
+  return {
+    id, ticker, sector, tf, signal, dateC1, dateC2, age,
+    crth, crtl, mid50, mid10, rangePct, price, keMidPct,
+    nilai20d, status, sma20, sma50, rsi14, stochK, stochD
+  };
+}
+
+function buildDemoDataset() {
+  const samples = [
+    { ticker: 'BBCA', sector: 'Keuangan', tf: 'D', signal: 'POTENSI BULL (>50%)', dateC1: '2026-11-26', dateC2: '2026-11-27', age: 0, crth: 10250, crtl: 9975, price: 10150, nilai20d: 1136.1, status: 'OPEN', sma20: 10080, sma50: 10190, rsi14: 54.2, stochK: 68.4, stochD: 52.1 },
+    { ticker: 'BBRI', sector: 'Keuangan', tf: 'D', signal: 'POTENSI BULL CRT', dateC1: '2026-11-26', dateC2: '2026-11-27', age: 0, crth: 4480, crtl: 4320, price: 4370, nilai20d: 892.4, status: 'OPEN', sma20: 4410, sma50: 4560, rsi14: 43.8, stochK: 34.6, stochD: 24.9 },
+    { ticker: 'BMRI', sector: 'Keuangan', tf: 'D', signal: 'BULL (>50%)', dateC1: '2026-11-25', dateC2: '2026-11-26', age: 1, crth: 6550, crtl: 6325, price: 6475, nilai20d: 745.8, status: 'OPEN', sma20: 6420, sma50: 6590, rsi14: 51.5, stochK: 72.1, stochD: 61.3 },
+    { ticker: 'TLKM', sector: 'Infrastruktur', tf: 'D', signal: 'POTENSI BULL (>50%)', dateC1: '2026-11-26', dateC2: '2026-11-27', age: 0, crth: 2780, crtl: 2670, price: 2740, nilai20d: 468.2, status: 'OPEN', sma20: 2710, sma50: 2810, rsi14: 49.4, stochK: 64.0, stochD: 48.2 },
+    { ticker: 'ASII', sector: 'Perindustrian', tf: 'W', signal: 'BULL CRT', dateC1: '2026-11-16', dateC2: '2026-11-23', age: 1, crth: 5150, crtl: 4890, price: 5000, nilai20d: 392.7, status: 'OPEN', sma20: 4980, sma50: 4910, rsi14: 56.1, stochK: 61.8, stochD: 54.0 },
+    { ticker: 'BBNI', sector: 'Keuangan', tf: 'D', signal: 'BULL CRT', dateC1: '2026-11-24', dateC2: '2026-11-25', age: 2, crth: 5050, crtl: 4860, price: 4940, nilai20d: 356.9, status: 'OPEN', sma20: 4970, sma50: 5120, rsi14: 46.7, stochK: 49.2, stochD: 38.5 },
+    { ticker: 'AMMN', sector: 'Barang Baku', tf: 'D', signal: 'BEAR (>50%)', dateC1: '2026-11-25', dateC2: '2026-11-26', age: 1, crth: 9450, crtl: 8950, price: 9125, nilai20d: 618.4, status: 'OPEN', sma20: 9240, sma50: 9480, rsi14: 44.1, stochK: 28.5, stochD: 41.2 },
+    { ticker: 'ADRO', sector: 'Energi', tf: 'D', signal: 'POTENSI BULL CRT', dateC1: '2026-11-26', dateC2: '2026-11-27', age: 0, crth: 2420, crtl: 2310, price: 2350, nilai20d: 341.6, status: 'OPEN', sma20: 2380, sma50: 2490, rsi14: 42.9, stochK: 31.7, stochD: 22.4 },
+    { ticker: 'BRIS', sector: 'Keuangan', tf: 'W', signal: 'BULL (>50%)', dateC1: '2026-11-16', dateC2: '2026-11-23', age: 1, crth: 2940, crtl: 2740, price: 2870, nilai20d: 264.5, status: 'OPEN', sma20: 2820, sma50: 2760, rsi14: 58.6, stochK: 76.3, stochD: 65.8 },
+    { ticker: 'ANTM', sector: 'Barang Baku', tf: 'D', signal: 'POTENSI BULL (>50%)', dateC1: '2026-11-26', dateC2: '2026-11-27', age: 0, crth: 1560, crtl: 1485, price: 1530, nilai20d: 238.9, status: 'OPEN', sma20: 1510, sma50: 1545, rsi14: 52.3, stochK: 66.9, stochD: 51.4 },
+    { ticker: 'GOTO', sector: 'Teknologi', tf: 'D', signal: 'BULL CRT', dateC1: '2026-11-24', dateC2: '2026-11-25', age: 2, crth: 74, crtl: 68, price: 71, nilai20d: 312.0, status: 'OPEN', sma20: 70, sma50: 67, rsi14: 55.4, stochK: 58.2, stochD: 49.0 },
+    { ticker: 'BREN', sector: 'Energi', tf: 'W', signal: 'BEAR CRT', dateC1: '2026-11-16', dateC2: '2026-11-23', age: 1, crth: 7150, crtl: 6625, price: 6825, nilai20d: 485.3, status: 'OPEN', sma20: 6950, sma50: 7120, rsi14: 45.0, stochK: 33.1, stochD: 46.8 },
+    { ticker: 'TPIA', sector: 'Barang Baku', tf: 'M', signal: 'BULL (>50%)', dateC1: '2026-10-01', dateC2: '2026-11-01', age: 0, crth: 8450, crtl: 7650, price: 8175, nilai20d: 294.1, status: 'OPEN', sma20: 7980, sma50: 7620, rsi14: 60.2, stochK: 79.4, stochD: 68.1 },
+    { ticker: 'UNTR', sector: 'Perindustrian', tf: 'D', signal: 'POTENSI BEAR CRT', dateC1: '2026-11-26', dateC2: '2026-11-27', age: 0, crth: 26850, crtl: 26100, price: 26550, nilai20d: 184.7, status: 'OPEN', sma20: 26350, sma50: 25900, rsi14: 59.8, stochK: 74.2, stochD: 81.6 },
+    { ticker: 'ICBP', sector: 'Barang Konsumen Primer', tf: 'W', signal: 'BULL CRT', dateC1: '2026-11-16', dateC2: '2026-11-23', age: 1, crth: 11850, crtl: 11325, price: 11525, nilai20d: 142.3, status: 'OPEN', sma20: 11600, sma50: 11750, rsi14: 47.6, stochK: 44.5, stochD: 35.2 },
+    { ticker: 'INDF', sector: 'Barang Konsumen Primer', tf: 'D', signal: 'BULL (>50%)', dateC1: '2026-11-25', dateC2: '2026-11-26', age: 1, crth: 7650, crtl: 7400, price: 7550, nilai20d: 118.6, status: 'OPEN', sma20: 7480, sma50: 7350, rsi14: 56.9, stochK: 71.0, stochD: 59.4 },
+    { ticker: 'PGAS', sector: 'Energi', tf: 'D', signal: 'POTENSI BULL CRT', dateC1: '2026-11-26', dateC2: '2026-11-27', age: 0, crth: 1545, crtl: 1490, price: 1510, nilai20d: 165.4, status: 'OPEN', sma20: 1520, sma50: 1535, rsi14: 48.1, stochK: 42.3, stochD: 31.8 },
+    { ticker: 'PTBA', sector: 'Energi', tf: 'M', signal: 'BULL CRT', dateC1: '2026-10-01', dateC2: '2026-11-01', age: 0, crth: 2890, crtl: 2640, price: 2740, nilai20d: 129.8, status: 'OPEN', sma20: 2760, sma50: 2710, rsi14: 51.2, stochK: 55.6, stochD: 47.9 },
+    { ticker: 'MDKA', sector: 'Barang Baku', tf: 'D', signal: 'DBL SWEEP', dateC1: '2026-11-24', dateC2: '2026-11-25', age: 2, crth: 2180, crtl: 2040, price: 2110, nilai20d: 196.2, status: 'OPEN', sma20: 2125, sma50: 2210, rsi14: 46.3, stochK: 50.4, stochD: 48.7 },
+    { ticker: 'INCO', sector: 'Barang Baku', tf: 'W', signal: 'POTENSI BULL (>50%)', dateC1: '2026-11-16', dateC2: '2026-11-23', age: 1, crth: 3920, crtl: 3680, price: 3830, nilai20d: 112.5, status: 'OPEN', sma20: 3790, sma50: 3880, rsi14: 50.8, stochK: 63.5, stochD: 49.1 },
+    { ticker: 'KLBF', sector: 'Kesehatan', tf: 'D', signal: 'BEAR CRT', dateC1: '2026-11-21', dateC2: '2026-11-24', age: 3, crth: 1520, crtl: 1465, price: 1540, nilai20d: 94.3, status: 'TEMBUS', sma20: 1495, sma50: 1530, rsi14: 57.4, stochK: 78.9, stochD: 69.2 },
+    { ticker: 'EXCL', sector: 'Infrastruktur', tf: 'D', signal: 'BULL (>50%)', dateC1: '2026-11-25', dateC2: '2026-11-26', age: 1, crth: 2290, crtl: 2200, price: 2260, nilai20d: 88.7, status: 'OPEN', sma20: 2240, sma50: 2265, rsi14: 53.7, stochK: 69.8, stochD: 56.2 },
+    { ticker: 'ISAT', sector: 'Infrastruktur', tf: 'W', signal: 'BEAR (>50%)', dateC1: '2026-11-09', dateC2: '2026-11-16', age: 2, crth: 2540, crtl: 2360, price: 2320, nilai20d: 105.4, status: 'TEMBUS', sma20: 2430, sma50: 2510, rsi14: 39.5, stochK: 21.4, stochD: 34.6 },
+    { ticker: 'MEDC', sector: 'Energi', tf: 'D', signal: 'POTENSI BULL CRT', dateC1: '2026-11-26', dateC2: '2026-11-27', age: 0, crth: 1165, crtl: 1115, price: 1135, nilai20d: 134.2, status: 'OPEN', sma20: 1145, sma50: 1190, rsi14: 44.9, stochK: 37.8, stochD: 26.5 }
+  ];
+  return samples.map((item, idx) => enrichStockRow(idx + 1, item));
+}
+
+function loadSavedApiConfig() {
+  try {
+    const savedMode = localStorage.getItem(STORAGE_API_MODE);
+    const savedUrl  = localStorage.getItem(STORAGE_API_KEY);
+    if (savedMode) {
+      apiMode = savedMode;
+    } else {
+      apiMode = 'AUTO';
+    }
+    if (apiMode === 'AUTO') {
+      gasApiUrl = DEFAULT_GAS_API_URL;
+    } else if (apiMode === 'MANUAL_URL' && savedUrl) {
+      gasApiUrl = savedUrl;
+    } else {
+      gasApiUrl = '';
+    }
+  } catch (e) {
+    apiMode = 'AUTO';
+    gasApiUrl = DEFAULT_GAS_API_URL;
+  }
+  updateApiBadgeUI();
+}
+
+function updateApiBadgeUI() {
+  const loginBadge = document.getElementById('loginApiStatusBadge');
+  const headerBadge = document.getElementById('headerApiModeBadge');
+  const connLabel = document.getElementById('connSourceLabel');
+  const autoPill = document.getElementById('autoActivePill');
+  const rawLink = document.getElementById('openRawScanLink');
+
+  if (rawLink) {
+    const targetBase = gasApiUrl || DEFAULT_GAS_API_URL;
+    rawLink.href = targetBase + (targetBase.includes('?') ? '&' : '?') + 'mode=scan';
+  }
+
+  if (apiMode === 'AUTO') {
+    if (loginBadge) {
+      loginBadge.textContent = '⚡ API Otomatis Aktif';
+      loginBadge.className = 'text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30';
+    }
+    if (headerBadge) {
+      headerBadge.textContent = 'AUTO';
+      headerBadge.className = 'text-emerald-400 font-mono';
+    }
+    if (connLabel) connLabel.textContent = 'TERHUBUNG (AUTO):';
+    if (autoPill) autoPill.classList.remove('hidden');
+  } else if (apiMode === 'MANUAL_URL') {
+    if (loginBadge) {
+      loginBadge.textContent = '🔧 API Manual URL';
+      loginBadge.className = 'text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/15 text-sky-400 border border-sky-500/30';
+    }
+    if (headerBadge) {
+      headerBadge.textContent = 'MANUAL URL';
+      headerBadge.className = 'text-sky-400 font-mono';
+    }
+    if (connLabel) connLabel.textContent = 'TERHUBUNG (MANUAL):';
+    if (autoPill) autoPill.classList.add('hidden');
+  } else if (apiMode === 'MANUAL_JSON') {
+    if (loginBadge) {
+      loginBadge.textContent = '📋 JSON Manual';
+      loginBadge.className = 'text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30';
+    }
+    if (headerBadge) {
+      headerBadge.textContent = 'JSON MANUAL';
+      headerBadge.className = 'text-amber-300 font-mono';
+    }
+    if (connLabel) connLabel.textContent = 'DATA MANUAL:';
+    if (autoPill) autoPill.classList.add('hidden');
+  } else {
+    if (loginBadge) {
+      loginBadge.textContent = '🧪 Mode Demo Offline';
+      loginBadge.className = 'text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30';
+    }
+    if (headerBadge) {
+      headerBadge.textContent = 'DEMO';
+      headerBadge.className = 'text-amber-300 font-mono';
+    }
+    if (connLabel) connLabel.textContent = 'MODE DEMO:';
+    if (autoPill) autoPill.classList.add('hidden');
+  }
+}
+
+function toggleLoginApiPanel() {
+  const panel = document.getElementById('loginApiPanel');
+  const inp = document.getElementById('loginApiUrlInput');
+  if (!panel) return;
+  panel.classList.toggle('hidden');
+  if (inp && !inp.value) {
+    inp.value = gasApiUrl || DEFAULT_GAS_API_URL;
+  }
+}
+
+function useAutoDefaultApiFromLogin() {
+  apiMode = 'AUTO';
+  gasApiUrl = DEFAULT_GAS_API_URL;
+  try {
+    localStorage.setItem(STORAGE_API_MODE, 'AUTO');
+    localStorage.setItem(STORAGE_API_KEY, DEFAULT_GAS_API_URL);
+  } catch (e) {}
+  const inp = document.getElementById('loginApiUrlInput');
+  if (inp) inp.value = DEFAULT_GAS_API_URL;
+  updateApiBadgeUI();
+  showToast('Endpoint otomatis GAS V16 diaktifkan.', 'success');
+}
+
+function saveApiUrlFromLogin() {
+  const inp = document.getElementById('loginApiUrlInput');
+  const val = inp ? inp.value.trim() : '';
+  if (!val) {
+    showToast('Masukkan URL Web App (/exec) terlebih dahulu.', 'warning');
+    return;
+  }
+  apiMode = 'MANUAL_URL';
+  gasApiUrl = val;
+  try {
+    localStorage.setItem(STORAGE_API_MODE, 'MANUAL_URL');
+    localStorage.setItem(STORAGE_API_KEY, val);
+  } catch (e) {}
+  updateApiBadgeUI();
+  showToast('URL Manual berhasil disimpan.', 'success');
+}
+
+function openApiConfigModal() {
+  const modal = document.getElementById('apiConfigModal');
+  const urlInp = document.getElementById('modalApiUrlInput');
+  const jsonInp = document.getElementById('manualJsonInput');
+  if (urlInp) urlInp.value = gasApiUrl || DEFAULT_GAS_API_URL;
+  if (jsonInp) {
+    try {
+      const savedJson = localStorage.getItem(STORAGE_MANUAL_JSON);
+      if (savedJson && !jsonInp.value) jsonInp.value = savedJson;
+    } catch (e) {}
+  }
+  updateApiBadgeUI();
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+  }
+}
+
+function closeApiConfigModal() {
+  const modal = document.getElementById('apiConfigModal');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+}
+
+function activateAutoDefaultApi() {
+  apiMode = 'AUTO';
+  gasApiUrl = DEFAULT_GAS_API_URL;
+  try {
+    localStorage.setItem(STORAGE_API_MODE, 'AUTO');
+    localStorage.setItem(STORAGE_API_KEY, DEFAULT_GAS_API_URL);
+  } catch (e) {}
+  updateApiBadgeUI();
+  closeApiConfigModal();
+  showToast('Beralih ke Mode Otomatis GAS V16...', 'info');
+  refreshEngineData();
+}
+
+function saveApiUrlFromModal() {
+  const inp = document.getElementById('modalApiUrlInput');
+  const val = inp ? inp.value.trim() : '';
+  if (!val) {
+    showToast('Masukkan URL Web App (/exec) terlebih dahulu.', 'warning');
+    return;
+  }
+  apiMode = 'MANUAL_URL';
+  gasApiUrl = val;
+  try {
+    localStorage.setItem(STORAGE_API_MODE, 'MANUAL_URL');
+    localStorage.setItem(STORAGE_API_KEY, val);
+  } catch (e) {}
+  updateApiBadgeUI();
+  closeApiConfigModal();
+  showToast('URL Manual disimpan. Memuat data...', 'info');
+  refreshEngineData();
+}
+
+function loadManualJsonData() {
+  const txtEl = document.getElementById('manualJsonInput');
+  const raw = txtEl ? txtEl.value.trim() : '';
+  if (!raw) {
+    showToast('Tempelkan output JSON terlebih dahulu.', 'warning');
+    return;
+  }
+  try {
+    const parsed = JSON.parse(raw);
+    const rows = Array.isArray(parsed) ? parsed : (Array.isArray(parsed.data) ? parsed.data : null);
+    if (!rows || rows.length === 0) {
+      showToast('Format JSON tidak valid atau array data kosong.', 'error');
+      return;
+    }
+    apiMode = 'MANUAL_JSON';
+    try {
+      localStorage.setItem(STORAGE_API_MODE, 'MANUAL_JSON');
+      localStorage.setItem(STORAGE_MANUAL_JSON, raw);
+    } catch (e) {}
+    allData = rows.map((r, i) => enrichStockRow(i + 1, r));
+    updateApiBadgeUI();
+    populateSectorDropdown();
+    applyFiltersAndRender();
+    updateSyncClock(parsed.updatedAt || null);
+    const countEl = document.getElementById('connRowCountText');
+    if (countEl) countEl.textContent = `JSON_Manual ${allData.length} baris`;
+    closeApiConfigModal();
+    showToast(`Berhasil memuat ${allData.length} baris dari JSON Manual.`, 'success');
+  } catch (err) {
+    showToast('Gagal membaca JSON: ' + err.message, 'error');
+  }
+}
+
+function clearApiUrl() {
+  apiMode = 'DEMO';
+  gasApiUrl = '';
+  try { localStorage.setItem(STORAGE_API_MODE, 'DEMO'); } catch (e) {}
+  updateApiBadgeUI();
+  closeApiConfigModal();
+  allData = buildDemoDataset();
+  populateSectorDropdown();
+  applyFiltersAndRender();
+  updateSyncClock();
+  const countEl = document.getElementById('connRowCountText');
+  if (countEl) countEl.textContent = `Demo_BEI ${allData.length} baris`;
+  showToast('Mode Demo Offline aktif.', 'warning');
+}
+
+function showLoginAlert(msg) {
+  const banner = document.getElementById('loginAlertBanner');
+  const txt = document.getElementById('loginAlertText');
+  if (txt) txt.textContent = msg;
+  if (banner) banner.classList.remove('hidden');
+}
+
+function hideLoginAlert() {
+  const banner = document.getElementById('loginAlertBanner');
+  if (banner) banner.classList.add('hidden');
+}
+
+const togglePwdBtnEl = document.getElementById('togglePasswordBtn');
+if (togglePwdBtnEl) {
+  togglePwdBtnEl.addEventListener('click', function () {
+    const inp = document.getElementById('password');
+    if (!inp) return;
+    if (inp.type === 'password') {
+      inp.type = 'text';
+      this.textContent = 'Sembunyikan';
+    } else {
+      inp.type = 'password';
+      this.textContent = 'Lihat';
+    }
+  });
+}
+
+function enterDemoMode() {
+  apiMode = 'DEMO';
+  gasApiUrl = '';
+  try { localStorage.setItem(STORAGE_API_MODE, 'DEMO'); } catch (e) {}
+  updateApiBadgeUI();
+  const demoSession = {
+    username: 'demo_idx',
+    nama: 'Trader Demo BEI',
+    expired: '2027-12-31',
+    token: 'DEMO_TOKEN',
+    role: 'DEMO'
+  };
+  completeLoginSuccess(demoSession);
+}
+
+const loginFormEl = document.getElementById('loginForm');
+if (loginFormEl) {
+  loginFormEl.addEventListener('submit', function (e) {
+    e.preventDefault();
+    hideLoginAlert();
+
+    const username = document.getElementById('username').value.trim().toLowerCase();
+    const password = document.getElementById('password').value.trim();
+    if (!username || !password) return;
+
+    const account = VALID_USERS[username];
+    if (!account || account.password !== password) {
+      showLoginAlert('Username atau password salah. (Default: khairu / wakzel123)');
+      return;
+    }
+
+    const session = {
+      username: username,
+      nama: account.nama,
+      expired: account.expired,
+      token: 'CRT16_' + Date.now(),
+      role: account.role
+    };
+    completeLoginSuccess(session);
+  });
+}
+
+function completeLoginSuccess(userSession) {
+  currentSession = userSession;
+  const rememberEl = document.getElementById('rememberMe');
+  const remember = rememberEl ? rememberEl.checked : true;
+  try {
+    if (remember) {
+      localStorage.setItem(STORAGE_SESSION_KEY, JSON.stringify(userSession));
+    } else {
+      sessionStorage.setItem(STORAGE_SESSION_KEY, JSON.stringify(userSession));
+    }
+  } catch (e) {}
+
+  const greetEl = document.getElementById('memberGreetingText');
+  const expEl = document.getElementById('memberExpiryText');
+  if (greetEl) greetEl.textContent = 'Halo, ' + userSession.nama;
+  if (expEl) expEl.textContent = 'Exp: ' + userSession.expired;
+
+  const loginScr = document.getElementById('loginScreen');
+  const dashScr = document.getElementById('dashboardScreen');
+  if (loginScr) loginScr.classList.add('hidden');
+  if (dashScr) dashScr.classList.remove('hidden');
+
+  refreshEngineData();
+}
+
+function logoutApp() {
+  currentSession = null;
+  try {
+    localStorage.removeItem(STORAGE_SESSION_KEY);
+    sessionStorage.removeItem(STORAGE_SESSION_KEY);
+  } catch (e) {}
+  const dashScr = document.getElementById('dashboardScreen');
+  const loginScr = document.getElementById('loginScreen');
+  if (dashScr) dashScr.classList.add('hidden');
+  if (loginScr) loginScr.classList.remove('hidden');
+  showToast('Anda telah keluar dari CRTMatrix.', 'info');
+}
+
+async function refreshEngineData() {
+  const refreshIcon = document.getElementById('refreshIcon');
+  if (refreshIcon) refreshIcon.classList.add('animate-spin');
+
+  const countEl = document.getElementById('connRowCountText');
+  const dotEl = document.getElementById('connDot');
+
+  try {
+    if (apiMode === 'MANUAL_JSON') {
+      const savedJson = localStorage.getItem(STORAGE_MANUAL_JSON);
+      if (savedJson) {
+        const parsed = JSON.parse(savedJson);
+        const rows = Array.isArray(parsed) ? parsed : (parsed.data || []);
+        allData = rows.map((r, i) => enrichStockRow(i + 1, r));
+        populateSectorDropdown();
+        applyFiltersAndRender();
+        updateSyncClock(parsed.updatedAt || null);
+        if (countEl) countEl.textContent = `JSON_Manual ${allData.length} baris`;
+        return;
+      }
+    }
+
+    if (apiMode === 'DEMO' || !gasApiUrl) {
+      allData = buildDemoDataset();
+      populateSectorDropdown();
+      applyFiltersAndRender();
+      updateSyncClock();
+      if (countEl) countEl.textContent = `Demo_BEI ${allData.length} baris`;
+      if (dotEl) dotEl.className = 'w-2 h-2 rounded-full bg-amber-400 animate-pulse-slow';
+      return;
+    }
+
+    const fetchUrl = gasApiUrl + (gasApiUrl.includes('?') ? '&' : '?') + 'mode=scan&t=' + Date.now();
+    const resp = await fetch(fetchUrl, { method: 'GET', redirect: 'follow' });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+
+    const json = await resp.json();
+    const rows = Array.isArray(json) ? json : (Array.isArray(json.data) ? json.data : []);
+
+    if (rows.length > 0) {
+      allData = rows.map((r, i) => enrichStockRow(i + 1, r));
+      populateSectorDropdown();
+      applyFiltersAndRender();
+      updateSyncClock(json.updatedAt || null);
+      if (countEl) countEl.textContent = `IDX_CRT_Engine ${allData.length} baris`;
+      if (dotEl) dotEl.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse-slow';
+      showToast(`Sinkronisasi berhasil: ${allData.length} sinyal dimuat.`, 'success');
+    } else {
+      allData = buildDemoDataset();
+      populateSectorDropdown();
+      applyFiltersAndRender();
+      updateSyncClock();
+      if (countEl) countEl.textContent = `Sheet Kosong (Demo ${allData.length})`;
+      showToast('Tab DATA_SCAN di Sheets masih kosong. Menampilkan data simulasi BEI.', 'warning');
+    }
+  } catch (err) {
+    console.warn('Fallback ke data simulasi BEI:', err);
+    allData = buildDemoDataset();
+    populateSectorDropdown();
+    applyFiltersAndRender();
+    updateSyncClock();
+    if (countEl) countEl.textContent = `Simulasi_BEI ${allData.length} baris`;
+    if (dotEl) dotEl.className = 'w-2 h-2 rounded-full bg-amber-400 animate-pulse-slow';
+    showToast('Koneksi GAS terbatas/offline — memuat data simulasi BEI.', 'warning');
+  } finally {
+    if (refreshIcon) {
+      setTimeout(() => refreshIcon.classList.remove('animate-spin'), 400);
+    }
+  }
+}
+
+function populateSectorDropdown() {
+  const sel = document.getElementById('sectorFilter');
+  if (!sel) return;
+  const currentVal = sel.value;
+  const counts = {};
+  allData.forEach(r => {
+    counts[r.sector] = (counts[r.sector] || 0) + 1;
+  });
+  const sectors = Object.keys(counts).sort();
+  sel.innerHTML = `<option value="ALL">Sektor: Semua (${allData.length})</option>` +
+    sectors.map(s => `<option value="${s}">${s} (${counts[s]})</option>`).join('');
+  if (sectors.includes(currentVal)) sel.value = currentVal;
+}
+
+document.querySelectorAll('.tf-btn').forEach(btn => {
+  btn.addEventListener('click', function () {
+    currentTf = this.getAttribute('data-tf') || 'ALL';
+    document.querySelectorAll('.tf-btn').forEach(b => {
+      b.className = 'tf-btn px-3 py-1.5 rounded-md text-xs font-medium text-slate-400 hover:text-white transition';
+    });
+    this.className = 'tf-btn px-3 py-1.5 rounded-md text-xs font-bold bg-[#10B981] text-[#06281E] transition';
+    currentPage = 1;
+    applyFiltersAndRender();
+  });
+});
+
+document.querySelectorAll('.sort-btn').forEach(btn => {
+  btn.addEventListener('click', function () {
+    const field = this.getAttribute('data-sort');
+    if (currentSort === field) {
+      sortAsc = !sortAsc;
+    } else {
+      currentSort = field;
+      sortAsc = (field === 'umur');
+    }
+    document.querySelectorAll('.sort-btn').forEach(b => {
+      const f = b.getAttribute('data-sort');
+      const labels = { nilai20d: 'Nilai 20D', keMid: 'Ke Mid', umur: 'Umur', tanggalC2: 'Tanggal C2' };
+      if (f === currentSort) {
+        b.className = 'sort-btn px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/40 transition';
+        b.textContent = `${labels[f]} ${sortAsc ? '↑' : '↓'}`;
+      } else {
+        b.className = 'sort-btn px-2.5 py-1 rounded-md text-xs font-medium bg-[#111827] text-slate-400 border border-[#1E293B] hover:text-white transition';
+        b.textContent = labels[f];
+      }
+    });
+    applyFiltersAndRender();
+  });
+});
+
+const searchInputEl = document.getElementById('searchInput');
+if (searchInputEl) searchInputEl.addEventListener('input', () => { currentPage = 1; applyFiltersAndRender(); });
+
+const sectorFilterEl = document.getElementById('sectorFilter');
+if (sectorFilterEl) sectorFilterEl.addEventListener('change', () => { currentPage = 1; applyFiltersAndRender(); });
+
+const signalFilterEl = document.getElementById('signalFilter');
+if (signalFilterEl) {
+  signalFilterEl.addEventListener('change', () => {
+    syncQuickSignalPills(signalFilterEl.value);
+    currentPage = 1;
+    applyFiltersAndRender();
+  });
+}
+
+const statusFilterEl = document.getElementById('statusFilter');
+if (statusFilterEl) statusFilterEl.addEventListener('change', () => { currentPage = 1; applyFiltersAndRender(); });
+
+const liquidityFilterEl = document.getElementById('liquidityFilter');
+if (liquidityFilterEl) liquidityFilterEl.addEventListener('change', () => { currentPage = 1; applyFiltersAndRender(); });
+
+function quickSelectSignal(sig) {
+  const sel = document.getElementById('signalFilter');
+  if (sel) sel.value = sig;
+  syncQuickSignalPills(sig);
+  currentPage = 1;
+  applyFiltersAndRender();
+}
+
+function syncQuickSignalPills(activeSig) {
+  document.querySelectorAll('.qsig-btn').forEach(btn => {
+    if (btn.getAttribute('data-qsig') === activeSig) {
+      btn.classList.add('ring-2', 'ring-emerald-400');
+    } else {
+      btn.classList.remove('ring-2', 'ring-emerald-400');
+    }
+  });
+}
+
+function resetFilters() {
+  if (searchInputEl) searchInputEl.value = '';
+  if (sectorFilterEl) sectorFilterEl.value = 'ALL';
+  if (signalFilterEl) signalFilterEl.value = 'ALL';
+  if (statusFilterEl) statusFilterEl.value = 'ALL';
+  if (liquidityFilterEl) liquidityFilterEl.value = 'ALL';
+  currentTf = 'ALL';
+  document.querySelectorAll('.tf-btn').forEach(b => {
+    if (b.getAttribute('data-tf') === 'ALL') {
+      b.className = 'tf-btn px-3 py-1.5 rounded-md text-xs font-bold bg-[#10B981] text-[#06281E] transition';
+    } else {
+      b.className = 'tf-btn px-3 py-1.5 rounded-md text-xs font-medium text-slate-400 hover:text-white transition';
+    }
+  });
+  syncQuickSignalPills('ALL');
+  currentPage = 1;
+  applyFiltersAndRender();
+  showToast('Semua filter direset.', 'info');
+}
+
+function applyFiltersAndRender() {
+  const query = searchInputEl ? searchInputEl.value.trim().toUpperCase() : '';
+  const sector = sectorFilterEl ? sectorFilterEl.value : 'ALL';
+  const signal = signalFilterEl ? signalFilterEl.value : 'ALL';
+  const status = statusFilterEl ? statusFilterEl.value : 'ALL';
+  const minLiq = liquidityFilterEl && liquidityFilterEl.value !== 'ALL' ? Number(liquidityFilterEl.value) : 0;
+
+  filteredData = allData.filter(row => {
+    if (query && !row.ticker.includes(query) && !row.sector.toUpperCase().includes(query)) return false;
+    if (currentTf !== 'ALL' && row.tf !== currentTf) return false;
+    if (sector !== 'ALL' && row.sector !== sector) return false;
+    if (signal !== 'ALL' && row.signal !== signal) return false;
+    if (status !== 'ALL' && row.status !== status) return false;
+    if (minLiq > 0 && row.nilai20d < minLiq) return false;
+    return true;
+  });
+
+  filteredData.sort((a, b) => {
+    let cmp = 0;
+    if (currentSort === 'nilai20d') {
+      cmp = a.nilai20d - b.nilai20d;
+    } else if (currentSort === 'keMid') {
+      cmp = Math.abs(a.keMidPct) - Math.abs(b.keMidPct);
+    } else if (currentSort === 'umur') {
+      cmp = a.age - b.age;
+    } else if (currentSort === 'tanggalC2') {
+      cmp = a.dateC2.localeCompare(b.dateC2);
+    }
+    return sortAsc ? cmp : -cmp;
+  });
+
+  updateKPIs(filteredData);
+  renderTable();
+}
+
+function updateKPIs(dataset) {
+  const total = dataset.length;
+  let cntD = 0, cntW = 0, cntM = 0;
+  let cntOpen = 0;
+  let bullConf = 0, bullPot = 0;
+  let bearConf = 0, bearPot = 0;
+  let sumVal = 0;
+
+  dataset.forEach(r => {
+    if (r.tf === 'D') cntD++;
+    else if (r.tf === 'W') cntW++;
+    else if (r.tf === 'M') cntM++;
+
+    if (r.status === 'OPEN') cntOpen++;
+
+    const isPot = r.signal.includes('POTENSI');
+    if (r.signal.includes('BULL')) {
+      if (isPot) bullPot++; else bullConf++;
+    } else if (r.signal.includes('BEAR')) {
+      if (isPot) bearPot++; else bearConf++;
+    }
+
+    sumVal += r.nilai20d;
+  });
+
+  const openPct = total > 0 ? Math.round((cntOpen / total) * 100) : 0;
+  const avgVal = total > 0 ? (sumVal / total).toFixed(1) : '0.0';
+
+  const kpiTotalEl = document.getElementById('kpiTotal');
+  const kpiTfEl = document.getElementById('kpiTfBreakdown');
+  const kpiOpenEl = document.getElementById('kpiOpen');
+  const kpiOpenPctEl = document.getElementById('kpiOpenPct');
+  const kpiBullEl = document.getElementById('kpiBull');
+  const kpiBullSplitEl = document.getElementById('kpiBullSplit');
+  const kpiBearEl = document.getElementById('kpiBear');
+  const kpiBearSplitEl = document.getElementById('kpiBearSplit');
+  const kpiAvgValEl = document.getElementById('kpiAvgVal');
+
+  if (kpiTotalEl) kpiTotalEl.textContent = total.toLocaleString('en-US');
+  if (kpiTfEl) kpiTfEl.textContent = `D:${cntD} • W:${cntW} • M:${cntM}`;
+  if (kpiOpenEl) kpiOpenEl.textContent = cntOpen.toLocaleString('en-US');
+  if (kpiOpenPctEl) kpiOpenPctEl.textContent = `${openPct}% aktif`;
+  if (kpiBullEl) kpiBullEl.textContent = (bullConf + bullPot).toLocaleString('en-US');
+  if (kpiBullSplitEl) kpiBullSplitEl.textContent = `${bullConf} / ${bullPot} pot`;
+  if (kpiBearEl) kpiBearEl.textContent = (bearConf + bearPot).toLocaleString('en-US');
+  if (kpiBearSplitEl) kpiBearSplitEl.textContent = `${bearConf} / ${bearPot} pot`;
+  if (kpiAvgValEl) kpiAvgValEl.textContent = `Rp ${avgVal} M`;
+}
+
+function getSignalBadgeHtml(sig) {
+  if (sig === 'POTENSI BULL (>50%)') {
+    return `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-400/20 text-amber-200 border border-amber-400/40">⚡ POTENSI BULL (&gt;50%)</span>`;
+  }
+  if (sig === 'POTENSI BULL CRT') {
+    return `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">⚡ POTENSI BULL CRT</span>`;
+  }
+  if (sig === 'BULL (>50%)') {
+    return `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">BULL (&gt;50%)</span>`;
+  }
+  if (sig === 'BULL CRT') {
+    return `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">BULL CRT</span>`;
+  }
+  if (sig === 'BEAR (>50%)') {
+    return `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-fuchsia-500/20 text-fuchsia-300 border border-fuchsia-500/40">BEAR (&gt;50%)</span>`;
+  }
+  if (sig === 'BEAR CRT') {
+    return `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/40">BEAR CRT</span>`;
+  }
+  if (sig.includes('POTENSI BEAR')) {
+    return `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-orange-500/20 text-orange-300 border border-orange-500/40">⚡ ${sig}</span>`;
+  }
+  if (sig === 'DBL SWEEP') {
+    return `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-600/20 text-orange-300 border border-orange-500/40">DBL SWEEP</span>`;
+  }
+  return `<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-800 text-slate-300 border border-slate-700">${sig}</span>`;
+}
+
+function getTfBadgeHtml(tf) {
+  if (tf === 'D') return `<span class="inline-block w-6 py-0.5 text-center rounded text-[10px] font-bold bg-sky-500/20 text-sky-300 border border-sky-500/35">D</span>`;
+  if (tf === 'W') return `<span class="inline-block w-6 py-0.5 text-center rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/35">W</span>`;
+  return `<span class="inline-block w-6 py-0.5 text-center rounded text-[10px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/35">M</span>`;
+}
+
+function renderTable() {
+  const tbody = document.getElementById('screenerTableBody');
+  if (!tbody) return;
+
+  const total = filteredData.length;
+  const totalBaseEl = document.getElementById('totalFilteredBase');
+  if (totalBaseEl) totalBaseEl.textContent = allData.length.toLocaleString('en-US');
+
+  if (total === 0) {
+    tbody.innerHTML = `<tr><td colspan="15" class="py-12 text-center font-sans text-slate-400">Tidak ada sinyal yang cocok dengan filter saat ini.</td></tr>`;
+    const shownEl = document.getElementById('shownCount');
+    const pagInfoEl = document.getElementById('paginationInfo');
+    if (shownEl) shownEl.textContent = '0';
+    if (pagInfoEl) pagInfoEl.textContent = 'Menampilkan 0 sinyal';
+    return;
+  }
+
+  const totalPages = showAllRows ? 1 : Math.max(1, Math.ceil(total / pageSize));
+  if (currentPage > totalPages) currentPage = totalPages;
+
+  const startIdx = showAllRows ? 0 : (currentPage - 1) * pageSize;
+  const endIdx = showAllRows ? total : Math.min(total, startIdx + pageSize);
+  const slice = filteredData.slice(startIdx, endIdx);
+
+  const shownEl = document.getElementById('shownCount');
+  const pagInfoEl = document.getElementById('paginationInfo');
+  const pageIndEl = document.getElementById('pageIndicator');
+  const prevBtn = document.getElementById('prevPageBtn');
+  const nextBtn = document.getElementById('nextPageBtn');
+
+  if (shownEl) shownEl.textContent = slice.length.toLocaleString('en-US');
+  if (pagInfoEl) pagInfoEl.textContent = `Menampilkan ${startIdx + 1}–${endIdx} dari ${total} sinyal`;
+  if (pageIndEl) pageIndEl.textContent = `Hal ${currentPage} / ${totalPages}`;
+  if (prevBtn) prevBtn.disabled = currentPage <= 1 || showAllRows;
+  if (nextBtn) nextBtn.disabled = currentPage >= totalPages || showAllRows;
+
+  tbody.innerHTML = slice.map(row => {
+    const keMidClass = row.keMidPct > 0 ? 'text-emerald-400' : (row.keMidPct < 0 ? 'text-amber-400' : 'text-slate-400');
+    const keMidSign = row.keMidPct > 0 ? '+' : '';
+    const stochBull = row.stochK >= row.stochD;
+    const stochClass = stochBull ? 'text-emerald-400' : 'text-rose-400';
+    const statusHtml = row.status === 'OPEN'
+      ? `<span class="px-2.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/35">OPEN</span>`
+      : `<span class="px-2.5 py-0.5 rounded text-[10px] font-semibold bg-slate-800 text-slate-400 border border-slate-700">${row.status}</span>`;
+
+    return `
+      <tr onclick="openStockModal(${row.id})" class="hover:bg-[#161F33] cursor-pointer transition-colors group">
+        <td class="py-3 px-4">
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-white group-hover:text-emerald-400 transition">${row.ticker}</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-sans font-medium bg-sky-500/10 text-sky-400 border border-sky-500/20">${row.sector}</span>
+          </div>
+        </td>
+        <td class="py-3 px-3 text-center">${getTfBadgeHtml(row.tf)}</td>
+        <td class="py-3 px-3">${getSignalBadgeHtml(row.signal)}</td>
+        <td class="py-3 px-3 text-slate-300">${row.dateC2}</td>
+        <td class="py-3 px-2.5 text-right text-slate-400">${row.age}</td>
+        <td class="py-3 px-3 text-right text-slate-200">${formatIDX(row.crth)}</td>
+        <td class="py-3 px-3 text-right text-slate-200">${formatIDX(row.crtl)}</td>
+        <td class="py-3 px-3 text-right text-amber-400 font-semibold">${formatIDX(row.mid50)}</td>
+        <td class="py-3 px-3 text-right text-yellow-300">${formatIDX(row.mid10)}</td>
+        <td class="py-3 px-3 text-center ${stochClass}">${row.stochK.toFixed(1)} / ${row.stochD.toFixed(1)}</td>
+        <td class="py-3 px-3 text-right text-slate-300">${row.rangePct.toFixed(2)}%</td>
+        <td class="py-3 px-3 text-right font-bold text-white">${formatIDX(row.price)}</td>
+        <td class="py-3 px-3 text-right font-semibold ${keMidClass}">${keMidSign}${row.keMidPct.toFixed(2)}%</td>
+        <td class="py-3 px-4 text-right font-bold text-sky-400">${row.nilai20d.toFixed(1)}</td>
+        <td class="py-3 px-4 text-center">${statusHtml}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function toggleShowAllRows() {
+  showAllRows = !showAllRows;
+  const btn = document.getElementById('toggleShowAllBtn');
+  if (btn) btn.textContent = showAllRows ? 'Mode Halaman (100/hal)' : 'Tampilkan Semua';
+  currentPage = 1;
+  renderTable();
+}
+
+function changePage(delta) {
+  currentPage = Math.max(1, currentPage + delta);
+  renderTable();
+}
+
+function openFirstRowModal() {
+  if (filteredData.length > 0) {
+    openStockModal(filteredData[0].id);
+  } else if (allData.length > 0) {
+    openStockModal(allData[0].id);
+  }
+}
+
+function openStockModal(stockId) {
+  const stock = allData.find(s => s.id === stockId);
+  if (!stock) return;
+  selectedStock = stock;
+  modalChartTf = stock.tf || 'D';
+
+  const tfMapLabel = { D: 'Daily (D)', W: 'Weekly (W)', M: 'Monthly (M)' };
+  document.getElementById('modalTickerIcon').textContent = stock.ticker;
+  document.getElementById('modalTitle').textContent = stock.ticker;
+  document.getElementById('modalSector').textContent = stock.sector;
+  document.getElementById('modalTfBadge').textContent = tfMapLabel[stock.tf] || stock.tf;
+  document.getElementById('modalSignalBadge').innerHTML = getSignalBadgeHtml(stock.signal);
+  document.getElementById('modalStatusBadge').innerHTML = stock.status === 'OPEN'
+    ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/35">OPEN</span>`
+    : `<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-800 text-slate-400 border border-slate-700">${stock.status}</span>`;
+
+  document.getElementById('vizDatesLabel').textContent = `C1 (${stock.dateC1}) → C2 (${stock.dateC2})`;
+  document.getElementById('vizCrtl').textContent = formatIDX(stock.crtl);
+  document.getElementById('vizMid10').textContent = formatIDX(stock.mid10);
+  document.getElementById('vizMid50').textContent = formatIDX(stock.mid50);
+  document.getElementById('vizCrth').textContent = formatIDX(stock.crth);
+
+  const zRange = Math.max(1, stock.crth - stock.crtl);
+  const posPct = Math.max(0, Math.min(100, Math.round(((stock.price - stock.crtl) / zRange) * 100)));
+  const mid10Pct = Math.max(0, Math.min(100, Math.round(((stock.mid10 - stock.crtl) / zRange) * 100)));
+
+  document.getElementById('vizPosPct').textContent = `${posPct}%`;
+  document.getElementById('vizRangeFill').style.width = `${posPct}%`;
+  document.getElementById('vizPriceDot').style.left = `${posPct}%`;
+  document.getElementById('vizMid10Pin').style.left = `${mid10Pct}%`;
+
+  document.getElementById('vizSma20').textContent = stock.sma20 > 0 ? formatIDX(stock.sma20) : '-';
+  document.getElementById('vizSma50').textContent = stock.sma50 > 0 ? formatIDX(stock.sma50) : '-';
+  document.getElementById('vizRsi14').textContent = stock.rsi14.toFixed(1);
+  document.getElementById('vizStochKD').textContent = `K ${stock.stochK.toFixed(1)} / D ${stock.stochD.toFixed(1)}`;
+
+  const isBull = !stock.signal.includes('BEAR');
+  const confEl = document.getElementById('modalConfluenceText');
+  if (isBull) {
+    confEl.textContent = stock.stochK >= stock.stochD ? 'Bullish + StochRSI K > D (Searah)' : 'Bullish CRT, StochRSI K < D';
+    confEl.className = stock.stochK >= stock.stochD ? 'font-semibold text-emerald-400' : 'font-semibold text-amber-400';
+  } else {
+    confEl.textContent = stock.stochK <= stock.stochD ? 'Bearish + StochRSI K < D (Searah)' : 'Bearish CRT, StochRSI K > D';
+    confEl.className = stock.stochK <= stock.stochD ? 'font-semibold text-rose-400' : 'font-semibold text-amber-400';
+  }
+
+  const tick = getBEITickSize(stock.price);
+  document.getElementById('beiTickBadge').textContent = `Fraksi BEI: Rp ${tick}`;
+  document.getElementById('rrEntryMode').value = 'CURRENT';
+  document.getElementById('calcEntry').value = stock.price;
+  document.getElementById('calcTarget').value = isBull ? stock.crth : stock.crtl;
+  applySlBufferPreset();
+
+  document.getElementById('btnTradingView').href = `https://www.tradingview.com/chart/?symbol=IDX%3A${encodeURIComponent(stock.ticker)}`;
+  document.getElementById('btnStockbit').href = `https://stockbit.com/symbol/${encodeURIComponent(stock.ticker)}`;
+
+  const modal = document.getElementById('stockModal');
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+
+  switchModalChartTf(modalChartTf);
+}
+
+function closeModal() {
+  const modal = document.getElementById('stockModal');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+}
+
+function switchModalChartTf(tf) {
+  modalChartTf = tf;
+  document.querySelectorAll('.mtf-btn').forEach(b => {
+    if (b.getAttribute('data-mtf') === tf) {
+      b.className = 'mtf-btn px-2.5 py-1 rounded text-xs font-bold bg-emerald-500 text-[#06281E]';
+    } else {
+      b.className = 'mtf-btn px-2.5 py-1 rounded text-xs font-medium text-slate-400 hover:text-white';
+    }
+  });
+  if (selectedStock) {
+    loadModalChart(selectedStock.ticker, tf);
+  }
+}
+
+async function loadModalChart(ticker, tf) {
+  const container = document.getElementById('tvLightweightChart');
+  const overlay = document.getElementById('chartLoadingOverlay');
+  const badge = document.getElementById('chartSourceBadge');
+  if (!container || !selectedStock) return;
+
+  if (overlay) overlay.classList.remove('hidden');
+
+  try {
+    let candles = null;
+    let sma20Data = [];
+    let sma50Data = [];
+    let levels = {
+      crth: selectedStock.crth,
+      crtl: selectedStock.crtl,
+      mid50: selectedStock.mid50,
+      mid10: selectedStock.mid10
+    };
+    let markers = [];
+
+    if (gasApiUrl && (apiMode === 'AUTO' || apiMode === 'MANUAL_URL')) {
+      const url = `${gasApiUrl}${gasApiUrl.includes('?') ? '&' : '?'}mode=chart&ticker=${encodeURIComponent(ticker)}&tf=${encodeURIComponent(tf)}`;
+      const resp = await fetch(url, { method: 'GET', redirect: 'follow' });
+      if (resp.ok) {
+        const json = await resp.json();
+        if (json.status === 'ok' && Array.isArray(json.candles) && json.candles.length > 2) {
+          candles = json.candles;
+          sma20Data = json.sma20 || [];
+          sma50Data = json.sma50 || [];
+          if (json.levels) levels = json.levels;
+          markers = json.markers || [];
+          if (badge) {
+            badge.textContent = `OHLC Real IDX (${tf})`;
+            badge.className = 'px-2 py-0.5 text-[10px] font-mono rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30';
+          }
+        }
+      }
+    }
+
+    if (!candles) {
+      candles = renderFallbackCandles(ticker, selectedStock);
+      if (badge) {
+        badge.textContent = `Simulasi Zona C1 (${tf})`;
+        badge.className = 'px-2 py-0.5 text-[10px] font-mono rounded bg-amber-500/15 text-amber-300 border border-amber-500/30';
+      }
+    }
+
+    container.innerHTML = '';
+    if (typeof LightweightCharts !== 'undefined') {
+      lwChart = LightweightCharts.createChart(container, {
+        width: container.clientWidth || 560,
+        height: container.clientHeight || 310,
+        layout: {
+          background: { color: '#0B0F17' },
+          textColor: '#94A3B8',
+          fontFamily: 'JetBrains Mono, monospace',
+          fontSize: 11
+        },
+        grid: {
+          vertLines: { color: '#1E293B' },
+          horzLines: { color: '#1E293B' }
+        },
+        rightPriceScale: { borderColor: '#1E293B' },
+        timeScale: { borderColor: '#1E293B' }
+      });
+
+      const candleSeries = lwChart.addCandlestickSeries({
+        upColor: '#10B981',
+        downColor: '#F43F5E',
+        borderUpColor: '#10B981',
+        borderDownColor: '#F43F5E',
+        wickUpColor: '#10B981',
+        wickDownColor: '#F43F5E'
+      });
+      candleSeries.setData(candles);
+
+      if (markers.length > 0) {
+        candleSeries.setMarkers(markers);
+      }
+
+      if (sma20Data.length > 0) {
+        const s20 = lwChart.addLineSeries({ color: '#F59E0B', lineWidth: 1.5, title: 'SMA 20' });
+        s20.setData(sma20Data);
+      }
+      if (sma50Data.length > 0) {
+        const s50 = lwChart.addLineSeries({ color: '#38BDF8', lineWidth: 1.5, title: 'SMA 50' });
+        s50.setData(sma50Data);
+      }
+
+      if (levels.crth > 0) {
+        candleSeries.createPriceLine({ price: levels.crth, color: '#10B981', lineWidth: 2, lineStyle: 2, axisLabelVisible: true, title: 'CRTH' });
+      }
+      if (levels.crtl > 0) {
+        candleSeries.createPriceLine({ price: levels.crtl, color: '#F43F5E', lineWidth: 2, lineStyle: 2, axisLabelVisible: true, title: 'CRTL' });
+      }
+      if (levels.mid50 > 0) {
+        candleSeries.createPriceLine({ price: levels.mid50, color: '#94A3B8', lineWidth: 1, lineStyle: 1, axisLabelVisible: true, title: 'MID 50%' });
+      }
+      if (levels.mid10 > 0) {
+        candleSeries.createPriceLine({ price: levels.mid10, color: '#FDE047', lineWidth: 1, lineStyle: 1, axisLabelVisible: true, title: 'MID 10%' });
+      }
+
+      lwChart.timeScale().fitContent();
+    }
+  } catch (e) {
+    console.warn('Chart fallback:', e);
+  } finally {
+    if (overlay) overlay.classList.add('hidden');
+  }
+}
+
+function renderFallbackCandles(ticker, stock) {
+  const out = [];
+  const baseDate = new Date('2026-10-15T00:00:00Z');
+  const mid = stock.mid50 || stock.price;
+  const span = Math.max(10, stock.crth - stock.crtl);
+  const isBull = !stock.signal.includes('BEAR');
+
+  for (let i = 0; i < 24; i++) {
+    const d = new Date(baseDate.getTime() + i * 86400000);
+    const dateStr = d.toISOString().slice(0, 10);
+    const wave = Math.sin(i * 0.6) * span * 0.35;
+    const o = roundToBEITick(mid + wave);
+    const c = roundToBEITick(mid + wave + (i % 2 === 0 ? span * 0.15 : -span * 0.15));
+    const h = roundToBEITick(Math.max(o, c) + span * 0.12);
+    const l = roundToBEITick(Math.min(o, c) - span * 0.12);
+    out.push({ time: dateStr, open: o, high: h, low: l, close: c });
+  }
+
+  const c1Date = new Date(baseDate.getTime() + 24 * 86400000).toISOString().slice(0, 10);
+  const c1Open = isBull ? roundToBEITick(stock.crth - span * 0.2) : roundToBEITick(stock.crtl + span * 0.2);
+  const c1Close = isBull ? roundToBEITick(stock.crtl + span * 0.2) : roundToBEITick(stock.crth - span * 0.2);
+  out.push({ time: c1Date, open: c1Open, high: stock.crth, low: stock.crtl, close: c1Close });
+
+  const c2Date = new Date(baseDate.getTime() + 25 * 86400000).toISOString().slice(0, 10);
+  const tick = getBEITickSize(stock.price);
+  out.push({
+    time: c2Date,
+    open: c1Close,
+    high: isBull ? stock.price : roundToBEITick(stock.crth + 3 * tick),
+    low: isBull ? roundToBEITick(stock.crtl - 3 * tick) : stock.price,
+    close: stock.price
+  });
+
+  return out;
+}
+
+function applyEntryModePreset() {
+  if (!selectedStock) return;
+  const mode = document.getElementById('rrEntryMode').value;
+  const isBull = !selectedStock.signal.includes('BEAR');
+  let entry = selectedStock.price;
+  if (mode === 'MID10') entry = selectedStock.mid10;
+  else if (mode === 'EDGE') entry = isBull ? selectedStock.crtl : selectedStock.crth;
+  document.getElementById('calcEntry').value = entry;
+  recalculateBEI();
+}
+
+function applySlBufferPreset() {
+  if (!selectedStock) return;
+  const bufTicks = Math.max(1, Number(document.getElementById('calcSlBufferTicks').value) || 3);
+  const tick = getBEITickSize(selectedStock.price);
+  const isBull = !selectedStock.signal.includes('BEAR');
+  const sl = isBull
+    ? roundToBEITick(selectedStock.crtl - bufTicks * tick)
+    : roundToBEITick(selectedStock.crth + bufTicks * tick);
+  document.getElementById('calcStopLoss').value = sl;
+  recalculateBEI();
+}
+
+function setTpLevel(level) {
+  if (!selectedStock) return;
+  let tp = selectedStock.mid50;
+  if (level === 'CRTH') tp = selectedStock.crth;
+  else if (level === 'CRTL') tp = selectedStock.crtl;
+  document.getElementById('calcTarget').value = tp;
+  recalculateBEI();
+}
+
+function recalculateBEI() {
+  const lots   = Math.max(1, Number(document.getElementById('calcLotInput').value) || 1);
+  const entry  = Math.max(1, Number(document.getElementById('calcEntry').value) || 1);
+  const sl     = Math.max(1, Number(document.getElementById('calcStopLoss').value) || 1);
+  const tp     = Math.max(1, Number(document.getElementById('calcTarget').value) || 1);
+
+  const shares    = lots * 100;
+  const modalRp   = entry * shares;
+  const rewardPts = Math.abs(tp - entry);
+  const riskPts   = Math.max(1, Math.abs(entry - sl));
+  const rrRatio   = rewardPts / riskPts;
+
+  const profitRp  = rewardPts * shares;
+  const lossRp    = riskPts * shares;
+  const profitPct = (rewardPts / entry) * 100;
+  const lossPct   = (riskPts / entry) * 100;
+
+  document.getElementById('resModalRp').textContent    = 'Rp ' + formatCompactRp(modalRp);
+  document.getElementById('resSharesText').textContent = `${lots.toLocaleString('en-US')} Lot (${shares.toLocaleString('en-US')} lembar)`;
+  document.getElementById('resRRRatio').textContent    = `1 : ${rrRatio.toFixed(2)}`;
+  document.getElementById('resProfitRp').textContent   = '+Rp ' + formatCompactRp(profitRp);
+  document.getElementById('resProfitPct').textContent  = `+${profitPct.toFixed(2)}%`;
+  document.getElementById('resLossRp').textContent     = '-Rp ' + formatCompactRp(lossRp);
+  document.getElementById('resLossPct').textContent    = `-${lossPct.toFixed(2)}%`;
+}
+
+function copyTradePlan() {
+  if (!selectedStock) return;
+  const lots   = document.getElementById('calcLotInput').value;
+  const entry  = document.getElementById('calcEntry').value;
+  const sl     = document.getElementById('calcStopLoss').value;
+  const tp     = document.getElementById('calcTarget').value;
+  const rr     = document.getElementById('resRRRatio').textContent;
+  const modal  = document.getElementById('resModalRp').textContent;
+  const profit = document.getElementById('resProfitRp').textContent;
+  const loss   = document.getElementById('resLossRp').textContent;
+
+  const planText = [
+    `⚡ TRADE PLAN CRTMATRIX V16 PRO`,
+    `Emiten : ${selectedStock.ticker} (${selectedStock.sector}) [${selectedStock.tf}]`,
+    `Sinyal : ${selectedStock.signal} (${selectedStock.status})`,
+    `Zona C1: CRTL ${formatIDX(selectedStock.crtl)} | MID10 ${formatIDX(selectedStock.mid10)} | MID50 ${formatIDX(selectedStock.mid50)} | CRTH ${formatIDX(selectedStock.crth)}`,
+    `Entry  : Rp ${formatIDX(entry)} (${lots} Lot / Modal ${modal})`,
+    `Target : Rp ${formatIDX(tp)} (${profit})`,
+    `StopL  : Rp ${formatIDX(sl)} (${loss})`,
+    `R:R    : ${rr}`
+  ].join('\n');
+
+  const helper = document.getElementById('clipboardHelper');
+  if (helper) {
+    helper.value = planText;
+    helper.select();
+    try {
+      document.execCommand('copy');
+      showToast(`Trade Plan ${selectedStock.ticker} berhasil disalin!`, 'success');
+    } catch (e) {
+      showToast('Gagal menyalin Trade Plan.', 'error');
+    }
+  }
+}
+
+function initApp() {
+  loadSavedApiConfig();
+  try {
+    const rawSession = localStorage.getItem(STORAGE_SESSION_KEY) || sessionStorage.getItem(STORAGE_SESSION_KEY);
+    if (rawSession) {
+      const parsed = JSON.parse(rawSession);
+      if (parsed && parsed.username) {
+        completeLoginSuccess(parsed);
+        return;
+      }
+    }
+  } catch (e) {}
+}
+
+window.addEventListener('DOMContentLoaded', initApp);
+</script>
+</body>
+</html>
