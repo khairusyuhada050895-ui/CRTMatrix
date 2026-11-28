@@ -1,337 +1,1373 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#050907" />
-  <title>CRTMatrix — Masuki Dimensi Digital</title>
+  <title>EWMatrix V16 PRO — Elliott Wave & Fibonacci Screener IDX</title>
+  <!-- Google Fonts: Inter & JetBrains Mono untuk angka presisi terminal -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            obsidian: '#070B12',
+            surface: '#0D131F',
+            surfaceLight: '#131C2E',
+            borderDark: '#1E293B',
+            emeraldPro: '#10B981',
+          }
+        }
+      }
+    };
+  </script>
   <style>
-    :root {
-      color-scheme: dark;
-      --bg: #050907;
-      --panel: rgba(8, 19, 13, .82);
-      --green: #67ff9a;
-      --muted: #91a99a;
-      --line: rgba(103, 255, 154, .22);
-    }
-
-    * { box-sizing: border-box; }
-
     body {
-      margin: 0;
-      min-height: 100vh;
-      overflow-x: hidden;
-      background: var(--bg);
-      color: #e4ffec;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      background-color: #070B12;
+      color: #E2E8F0;
+      font-family: 'Inter', sans-serif;
     }
-
-    #matrix {
-      position: fixed;
-      inset: 0;
-      z-index: -2;
-      opacity: .24;
+    /* Custom Scrollbar untuk tabel terminal */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
     }
-
-    body::after {
-      content: "";
-      position: fixed;
-      inset: 0;
-      z-index: 3;
-      pointer-events: none;
-      opacity: .13;
-      background: repeating-linear-gradient(
-        to bottom,
-        transparent 0,
-        transparent 3px,
-        rgba(0, 0, 0, .45) 4px
-      );
+    ::-webkit-scrollbar-track {
+      background: #070B12;
     }
-
-    a { color: inherit; text-decoration: none; }
-
-    .container {
-      width: min(1120px, calc(100% - 40px));
-      margin: auto;
+    ::-webkit-scrollbar-thumb {
+      background: #1E293B;
+      border-radius: 9999px;
     }
-
-    header {
-      height: 82px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid var(--line);
+    ::-webkit-scrollbar-thumb:hover {
+      background: #334155;
     }
-
-    .logo {
-      color: var(--green);
-      font-size: 1.15rem;
-      font-weight: 800;
-      letter-spacing: .12em;
-    }
-
-    .logo span { color: #e4ffec; }
-
-    nav { display: flex; gap: 30px; color: var(--muted); font-size: .85rem; }
-    nav a:hover { color: var(--green); }
-
-    .status {
-      color: var(--green);
-      font-size: .75rem;
-      letter-spacing: .08em;
-    }
-
-    .status::before {
-      content: "";
-      display: inline-block;
-      width: 7px;
-      height: 7px;
-      margin-right: 9px;
-      border-radius: 50%;
-      background: var(--green);
-      box-shadow: 0 0 12px var(--green);
-    }
-
-    main { position: relative; z-index: 1; }
-
-    .hero {
-      min-height: 690px;
-      display: grid;
-      grid-template-columns: 1.15fr .85fr;
-      align-items: center;
-      gap: 60px;
-      padding: 80px 0;
-    }
-
-    .eyebrow {
-      color: var(--green);
-      font-size: .78rem;
-      letter-spacing: .16em;
-      text-transform: uppercase;
-    }
-
-    h1 {
-      max-width: 720px;
-      margin: 20px 0;
-      font-size: clamp(3rem, 7vw, 6.4rem);
-      line-height: .98;
-      letter-spacing: -.08em;
-    }
-
-    h1 span {
-      color: var(--green);
-      text-shadow: 0 0 24px rgba(103, 255, 154, .45);
-    }
-
-    .intro {
-      max-width: 540px;
-      color: var(--muted);
-      font-family: system-ui, sans-serif;
-      font-size: 1.05rem;
-      line-height: 1.8;
-    }
-
-    .actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 32px; }
-
-    .button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 48px;
-      padding: 0 20px;
-      border: 1px solid var(--green);
-      color: var(--bg);
-      background: var(--green);
-      font: inherit;
-      font-size: .85rem;
-      font-weight: 800;
-      cursor: pointer;
-      transition: .2s ease;
-    }
-
-    .button:hover { box-shadow: 0 0 25px rgba(103, 255, 154, .35); transform: translateY(-2px); }
-
-    .button.secondary { color: var(--green); background: transparent; }
-    .button.secondary:hover { background: rgba(103, 255, 154, .08); }
-
-    .terminal {
-      min-height: 360px;
-      padding: 22px;
-      border: 1px solid var(--line);
-      background: var(--panel);
-      box-shadow: 0 0 70px rgba(0, 255, 100, .07), inset 0 0 35px rgba(0, 255, 100, .025);
-      transform: perspective(900px) rotateY(-5deg);
-    }
-
-    .terminal-top {
-      display: flex;
-      justify-content: space-between;
-      padding-bottom: 16px;
-      border-bottom: 1px solid var(--line);
-      color: var(--muted);
-      font-size: .72rem;
-    }
-
-    .terminal-body { padding-top: 22px; color: var(--muted); font-size: .85rem; line-height: 2; }
-    .terminal-body .green { color: var(--green); }
-    .terminal-body .dim { color: #506b59; }
-    .cursor { animation: blink 1s steps(2, start) infinite; }
-
-    @keyframes blink { to { visibility: hidden; } }
-
-    .features {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      padding: 0 0 90px;
-    }
-
-    .feature {
-      padding: 24px;
-      border: 1px solid var(--line);
-      background: rgba(8, 19, 13, .65);
-    }
-
-    .feature .number { color: var(--green); font-size: .75rem; }
-    .feature h2 { margin: 18px 0 10px; font-size: 1rem; }
-    .feature p { margin: 0; color: var(--muted); font: .9rem/1.7 system-ui, sans-serif; }
-
-    footer {
-      padding: 24px 0;
-      border-top: 1px solid var(--line);
-      color: var(--muted);
-      font-size: .75rem;
-      display: flex;
-      justify-content: space-between;
-      gap: 15px;
-    }
-
-    @media (max-width: 760px) {
-      nav { display: none; }
-      .hero { grid-template-columns: 1fr; gap: 38px; min-height: auto; padding: 80px 0; }
-      .terminal { transform: none; }
-      .features { grid-template-columns: 1fr; padding-bottom: 55px; }
-      footer { flex-direction: column; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { animation-duration: .01ms !important; }
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
     }
   </style>
 </head>
-<body>
-  <canvas id="matrix" aria-hidden="true"></canvas>
+<body class="min-h-screen bg-obsidian text-slate-200 antialiased selection:bg-emerald-500/30 selection:text-emerald-200">
 
-  <div class="container">
-    <header>
-      <a class="logo" href="#" aria-label="CRTMatrix beranda">CRT<span>Matrix</span></a>
-      <nav aria-label="Navigasi utama">
-        <a href="#tentang">Tentang</a>
-        <a href="#fitur">Fitur</a>
-        <a href="mailto:hello@crtmatrix.dev">Kontak</a>
-      </nav>
-      <div class="status">SISTEM ONLINE</div>
+  <!-- ======================================================================= -->
+  <!-- TOAST NOTIFICATION CONTAINER (PENGGANTI ALERT)                          -->
+  <!-- ======================================================================= -->
+  <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm pointer-events-none"></div>
+
+  <!-- ======================================================================= -->
+  <!-- 1. HALAMAN LOGIN (SESUAI REFERENSI GAMBAR 2)                            -->
+  <!-- ======================================================================= -->
+  <section id="loginView" class="min-h-screen flex items-center justify-center p-4 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-obsidian to-obsidian">
+    <div class="w-full max-w-md bg-surface border border-slate-800/90 rounded-2xl p-6 sm:p-8 shadow-2xl shadow-black/80">
+      <!-- Logo & Judul -->
+      <div class="flex flex-col items-center text-center mb-6">
+        <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mb-4 shadow-lg shadow-emerald-500/10">
+          <svg class="w-6 h-6 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+            <polyline points="16 7 22 7 22 13"></polyline>
+          </svg>
+        </div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-2xl font-extrabold tracking-tight text-white">EWMatrix</h1>
+          <span class="px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">V16 PRO</span>
+        </div>
+        <p class="text-xs text-slate-400 mt-1.5 leading-relaxed">
+          Elliott Wave Theory &amp; Fibonacci Statistic (Daily • Weekly • Monthly) — Bursa Efek Indonesia
+        </p>
+
+        <!-- Status API Pill -->
+        <div class="mt-4 flex flex-wrap items-center justify-center gap-2 text-xs">
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 font-mono text-[11px]">
+            <span>⚡</span> Terhubung ke Sheet &amp; Apps Script API
+          </span>
+          <button type="button" onclick="openApiModal()" class="text-sky-400 hover:text-sky-300 underline underline-offset-2 text-[11px] font-medium transition">
+            Atur URL API / Sheet
+          </button>
+        </div>
+      </div>
+
+      <!-- Form Login -->
+      <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+        <div>
+          <label for="usernameInput" class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">USERNAME</label>
+          <input
+            id="usernameInput"
+            type="text"
+            value="trader_idx"
+            required
+            class="w-full px-3.5 py-2.5 rounded-xl bg-obsidian border border-slate-800 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/40 transition"
+            placeholder="Masukkan username"
+          />
+        </div>
+
+        <div>
+          <label for="passwordInput" class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">PASSWORD</label>
+          <div class="relative">
+            <input
+              id="passwordInput"
+              type="password"
+              value="elliottwave826"
+              required
+              class="w-full px-3.5 py-2.5 pr-14 rounded-xl bg-obsidian border border-slate-800 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/40 transition"
+              placeholder="••••••••••"
+            />
+            <button
+              type="button"
+              onclick="togglePasswordVisibility()"
+              id="togglePwdBtn"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-slate-400 hover:text-slate-200 transition"
+            >
+              Lihat
+            </button>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between pt-1 text-xs">
+          <label class="inline-flex items-center gap-2 text-slate-400 cursor-pointer select-none">
+            <input id="rememberMeCheckbox" type="checkbox" checked class="w-4 h-4 rounded border-slate-700 bg-obsidian text-emerald-500 focus:ring-emerald-500/40" />
+            <span>Ingat sesi login saya</span>
+          </label>
+          <button type="button" onclick="enterDemoMode()" class="text-emerald-400 hover:text-emerald-300 font-semibold transition">
+            Masuk Langsung →
+          </button>
+        </div>
+
+        <button
+          type="submit"
+          class="w-full py-3 px-4 mt-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-[0.99] text-slate-950 font-bold text-sm shadow-lg shadow-emerald-500/20 transition flex items-center justify-center gap-2"
+        >
+          <span>Buka Dashboard Elliott Wave</span>
+          <span>→</span>
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ======================================================================= -->
+  <!-- 2. DASHBOARD & SCREENER UTAMA (DISESUAIKAN DENGAN GOOGLE SHEET EW)      -->
+  <!-- ======================================================================= -->
+  <div id="appView" class="hidden min-h-screen flex flex-col">
+
+    <!-- TOP NAVIGATION BAR -->
+    <header class="sticky top-0 z-30 bg-obsidian/95 backdrop-blur-md border-b border-slate-800/80 px-3 sm:px-6 py-3">
+      <div class="max-w-[1680px] mx-auto flex flex-wrap items-center justify-between gap-3">
+        <!-- Brand Kiri -->
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+              <polyline points="16 7 22 7 22 13"></polyline>
+            </svg>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-extrabold text-base sm:text-lg tracking-tight text-white">EWMatrix</span>
+              <span class="px-1.5 py-0.5 text-[10px] font-bold uppercase rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">MTF 826</span>
+            </div>
+            <p class="text-[11px] text-slate-400 hidden sm:block">Elliott Wave Theory &amp; Fibonacci Statistic (Daily • Weekly • Monthly) — IDX</p>
+          </div>
+        </div>
+
+        <!-- Status Koneksi Google Sheet (Tengah) -->
+        <div class="order-3 lg:order-2 w-full lg:w-auto flex items-center justify-center">
+          <div id="connectionBadge" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-3.5 py-1.5 rounded-full bg-surface border border-slate-800 text-[11px] font-mono text-slate-300">
+            <span id="statusDot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span id="statusText">Menghubungkan ke IDX_ElliottWave_MTF_Scanner_826_Emiten...</span>
+          </div>
+        </div>
+
+        <!-- User Info & Action Buttons (Kanan) -->
+        <div class="order-2 lg:order-3 flex items-center gap-2 flex-wrap">
+          <a
+            href="https://docs.google.com/spreadsheets/d/1wCcK7ojMdoak1tHLfwJF0SGJG-iCg1XGIXN9ixn5yao/edit?usp=sharing"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="hidden xl:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface hover:bg-surfaceLight border border-slate-800 text-xs text-sky-400 hover:text-sky-300 font-medium transition"
+          >
+            <span>📊 Buka Google Sheet</span>
+            <span>↗</span>
+          </a>
+
+          <button
+            type="button"
+            onclick="openApiModal()"
+            class="px-2.5 py-1.5 rounded-lg bg-surface hover:bg-surfaceLight border border-slate-800 text-xs font-medium text-slate-300 transition inline-flex items-center gap-1.5"
+          >
+            <span>⚙️</span>
+            <span id="apiModeLabel">API: AUTO</span>
+          </button>
+
+          <button
+            type="button"
+            onclick="fetchAllTimeframes(true)"
+            id="refreshBtn"
+            class="px-3 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-xs font-semibold text-emerald-400 transition inline-flex items-center gap-1.5"
+          >
+            <svg id="refreshIcon" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+              <path d="M3 3v5h5"></path>
+              <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path>
+              <path d="M16 16h5v5"></path>
+            </svg>
+            <span>Refresh Data</span>
+          </button>
+
+          <button
+            type="button"
+            onclick="handleLogout()"
+            class="px-3 py-1.5 rounded-lg bg-surface hover:bg-rose-500/15 border border-slate-800 hover:border-rose-500/30 text-xs font-medium text-slate-300 hover:text-rose-400 transition"
+          >
+            Keluar
+          </button>
+        </div>
+      </div>
     </header>
 
-    <main>
-      <section class="hero" id="tentang">
-        <div>
-          <div class="eyebrow">[ Selamat datang di CRTMatrix ]</div>
-          <h1>Masuki<br />dimensi <span>digital.</span></h1>
-          <p class="intro">
-            Ruang untuk menjelajahi teknologi, kreativitas, dan ide-ide baru.
-            CRTMatrix adalah titik awal perjalananmu di dunia digital.
-          </p>
-          <div class="actions">
-            <a class="button" href="#fitur">JELAJAHI SEKARANG&nbsp; ↗</a>
-            <a class="button secondary" href="mailto:hello@crtmatrix.dev">HUBUNGI KAMI</a>
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-1 max-w-[1680px] w-full mx-auto px-3 sm:px-6 py-5 space-y-4">
+
+      <!-- 5 KPI SUMMARY CARDS (100% ELLIOTT WAVE & FIBONACCI METRICS) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+        <!-- Card 1: Total Sinyal Terdeteksi -->
+        <div class="bg-surface border border-slate-800/90 rounded-xl p-4 flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-medium text-slate-400">Total Sinyal Terdeteksi</span>
+            <span class="px-1.5 py-0.5 text-[10px] font-mono rounded bg-slate-800 text-slate-400">826×3</span>
+          </div>
+          <div class="mt-3 flex items-baseline justify-between gap-2">
+            <span id="kpiTotal" class="text-2xl sm:text-3xl font-extrabold font-mono text-white tabular-nums">0</span>
+            <span id="kpiTotalSub" class="text-[11px] font-mono text-slate-400">D:0 • W:0 • M:0</span>
           </div>
         </div>
 
-        <div class="terminal" aria-label="Tampilan terminal CRTMatrix">
-          <div class="terminal-top">
-            <span>CRT_MATRIX://WELCOME</span>
-            <span>v1.0.0</span>
+        <!-- Card 2: Setup Priority (Highlighted Emerald Card) -->
+        <div class="bg-emerald-950/20 border border-emerald-500/40 rounded-xl p-4 flex flex-col justify-between shadow-lg shadow-emerald-950/20">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-emerald-300">Setup Priority (Skor ≥ 55)</span>
+            <span class="px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">LIVE</span>
           </div>
-          <div class="terminal-body">
-            <div><span class="green">user@crtmatrix</span>:~$ initialize</div>
-            <div class="dim">Memuat antarmuka...</div>
-            <div class="dim">Menghubungkan ke jaringan...</div>
-            <div class="green">Koneksi berhasil.</div>
-            <br />
-            <div>Selamat datang, pengunjung.</div>
-            <div>Ide besar dimulai dari sini.</div>
-            <br />
-            <div><span class="green">user@crtmatrix</span>:~$ <span class="cursor">▌</span></div>
+          <div class="mt-3 flex items-baseline justify-between gap-2">
+            <span id="kpiPriority" class="text-2xl sm:text-3xl font-extrabold font-mono text-emerald-400 tabular-nums">0</span>
+            <span id="kpiPriorityPct" class="text-xs font-mono text-emerald-300/80">0% aktif</span>
           </div>
         </div>
-      </section>
 
-      <section class="features" id="fitur" aria-label="Keunggulan CRTMatrix">
-        <article class="feature">
-          <div class="number">01 / EKSPLORASI</div>
-          <h2>Jelajahi kemungkinan</h2>
-          <p>Temukan perspektif dan inspirasi baru di dalam ekosistem digital.</p>
-        </article>
-        <article class="feature">
-          <div class="number">02 / KREATIVITAS</div>
-          <h2>Bangun ide bersama</h2>
-          <p>Ubah gagasan menjadi sesuatu yang nyata melalui kreativitas dan teknologi.</p>
-        </article>
-        <article class="feature">
-          <div class="number">03 / KONEKSI</div>
-          <h2>Terhubung lebih jauh</h2>
-          <p>Jadilah bagian dari perjalanan menuju masa depan digital.</p>
-        </article>
-      </section>
+        <!-- Card 3: Impulse & Diagonal Wave -->
+        <div class="bg-surface border border-slate-800/90 rounded-xl p-4 flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-medium text-slate-400">Motive Wave (1-2-3-4-5)</span>
+            <span class="text-[11px] font-medium text-emerald-400">Impulse / Diag</span>
+          </div>
+          <div class="mt-3 flex items-baseline justify-between gap-2">
+            <span id="kpiMotive" class="text-2xl sm:text-3xl font-extrabold font-mono text-emerald-400 tabular-nums">0</span>
+            <span id="kpiMotiveSub" class="text-[11px] font-mono text-slate-400">0 imp / 0 diag</span>
+          </div>
+        </div>
+
+        <!-- Card 4: Simple & Complex Corrective -->
+        <div class="bg-surface border border-slate-800/90 rounded-xl p-4 flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-medium text-slate-400">Corrective Wave (A-B-C)</span>
+            <span class="text-[11px] font-medium text-rose-400">Simple / Complex</span>
+          </div>
+          <div class="mt-3 flex items-baseline justify-between gap-2">
+            <span id="kpiCorrective" class="text-2xl sm:text-3xl font-extrabold font-mono text-rose-400 tabular-nums">0</span>
+            <span id="kpiCorrectiveSub" class="text-[11px] font-mono text-slate-400">0 simp / 0 comp</span>
+          </div>
+        </div>
+
+        <!-- Card 5: Wave 3 & Reversal Wave C -->
+        <div class="bg-surface border border-slate-800/90 rounded-xl p-4 flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-medium text-slate-400">Zona Peluang Utama</span>
+            <span class="text-[11px] font-medium text-sky-400">Wave 3 &amp; Rev C</span>
+          </div>
+          <div class="mt-3 flex items-baseline justify-between gap-2">
+            <span id="kpiOpportunity" class="text-2xl sm:text-3xl font-extrabold font-mono text-sky-400 tabular-nums">0</span>
+            <span id="kpiOpportunitySub" class="text-[11px] font-mono text-slate-400">W3:0 • RevC:0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- FILTER & SEARCH CONTROL BAR -->
+      <div class="bg-surface border border-slate-800/90 rounded-xl p-4 space-y-3">
+        <!-- Row 1: Search, TF Pills, Dropdowns, Reset -->
+        <div class="flex flex-wrap items-center gap-2.5">
+          <!-- Search Input -->
+          <div class="relative flex-1 min-w-[220px]">
+            <svg class="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input
+              id="searchInput"
+              type="text"
+              oninput="applyFilters()"
+              placeholder="CARI KODE (MIS. BBCA, BBRI, BRIS, PTBA)..."
+              class="w-full pl-9 pr-3 py-2 rounded-lg bg-obsidian border border-slate-800 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/60 transition uppercase"
+            />
+          </div>
+
+          <!-- Timeframe Switcher -->
+          <div class="inline-flex items-center p-1 rounded-lg bg-obsidian border border-slate-800">
+            <button type="button" onclick="setTimeframeFilter('ALL')" data-tf="ALL" class="tf-btn px-3 py-1.5 rounded-md text-xs font-bold bg-emerald-500 text-slate-950 transition">ALL</button>
+            <button type="button" onclick="setTimeframeFilter('D')" data-tf="D" class="tf-btn px-3 py-1.5 rounded-md text-xs font-semibold text-slate-400 hover:text-white transition">Daily (D)</button>
+            <button type="button" onclick="setTimeframeFilter('W')" data-tf="W" class="tf-btn px-3 py-1.5 rounded-md text-xs font-semibold text-slate-400 hover:text-white transition">Weekly (W)</button>
+            <button type="button" onclick="setTimeframeFilter('M')" data-tf="M" class="tf-btn px-3 py-1.5 rounded-md text-xs font-semibold text-slate-400 hover:text-white transition">Monthly (M)</button>
+          </div>
+
+          <!-- Dropdown Sektor -->
+          <select id="sectorFilter" onchange="applyFilters()" class="px-3 py-2 rounded-lg bg-obsidian border border-slate-800 text-xs text-slate-200 focus:outline-none focus:border-emerald-500/60">
+            <option value="ALL">Sektor: Semua</option>
+          </select>
+
+          <!-- Dropdown Kategori Elliott Wave -->
+          <select id="categoryFilter" onchange="applyFilters()" class="px-3 py-2 rounded-lg bg-obsidian border border-slate-800 text-xs text-slate-200 focus:outline-none focus:border-emerald-500/60">
+            <option value="ALL">Semua Kategori Wave</option>
+            <option value="Impulse Wave">Impulse Wave</option>
+            <option value="Diagonal Wave">Diagonal Wave</option>
+            <option value="Simple Wave">Simple Wave</option>
+            <option value="Complex Wave">Complex Wave</option>
+          </select>
+
+          <!-- Dropdown Posisi Wave -->
+          <select id="wavePosFilter" onchange="applyFilters()" class="px-3 py-2 rounded-lg bg-obsidian border border-slate-800 text-xs text-slate-200 focus:outline-none focus:border-emerald-500/60">
+            <option value="ALL">Posisi Wave: Semua</option>
+            <option value="Wave 1">Wave 1</option>
+            <option value="Wave 2">Wave 2</option>
+            <option value="Wave 3">Wave 3</option>
+            <option value="Wave 4">Wave 4</option>
+            <option value="Wave 5">Wave 5</option>
+            <option value="Koreksi Wave A">Koreksi Wave A</option>
+            <option value="Koreksi Wave B">Koreksi Wave B</option>
+            <option value="Koreksi Wave C">Koreksi Wave C</option>
+          </select>
+
+          <!-- Reset Button -->
+          <button type="button" onclick="resetAllFilters()" class="px-3.5 py-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-xs font-semibold text-slate-200 transition">
+            Reset
+          </button>
+        </div>
+
+        <!-- Row 2: Quick Filter Chips -->
+        <div class="flex items-center gap-2 flex-wrap pt-1 border-t border-slate-800/60">
+          <span class="text-[11px] font-medium text-slate-400 mr-1">Filter Cepat:</span>
+          <button type="button" onclick="setQuickFilter('ALL')" data-qf="ALL" class="qf-btn px-2.5 py-1 rounded-md text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 transition">
+            Semua
+          </button>
+          <button type="button" onclick="setQuickFilter('EARLY_W3')" data-qf="EARLY_W3" class="qf-btn px-2.5 py-1 rounded-md text-[11px] font-semibold bg-amber-500/10 text-amber-300 border border-amber-500/30 hover:bg-amber-500/20 transition">
+            🔥 EARLY WAVE 3 IMPULSE
+          </button>
+          <button type="button" onclick="setQuickFilter('W3_MOMENTUM')" data-qf="W3_MOMENTUM" class="qf-btn px-2.5 py-1 rounded-md text-[11px] font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/20 transition">
+            ⚡ WAVE 3 MOMENTUM
+          </button>
+          <button type="button" onclick="setQuickFilter('W2_GOLDEN')" data-qf="W2_GOLDEN" class="qf-btn px-2.5 py-1 rounded-md text-[11px] font-semibold bg-sky-500/10 text-sky-300 border border-sky-500/30 hover:bg-sky-500/20 transition">
+            🎯 WAVE 2 GOLDEN ZONE
+          </button>
+          <button type="button" onclick="setQuickFilter('W4_PULLBACK')" data-qf="W4_PULLBACK" class="qf-btn px-2.5 py-1 rounded-md text-[11px] font-semibold bg-indigo-500/10 text-indigo-300 border border-indigo-500/30 hover:bg-indigo-500/20 transition">
+            📈 WAVE 4 PULLBACK
+          </button>
+          <button type="button" onclick="setQuickFilter('DIAGONAL')" data-qf="DIAGONAL" class="qf-btn px-2.5 py-1 rounded-md text-[11px] font-semibold bg-purple-500/10 text-purple-300 border border-purple-500/30 hover:bg-purple-500/20 transition">
+            📐 DIAGONAL SETUP
+          </button>
+          <button type="button" onclick="setQuickFilter('REVERSAL_C')" data-qf="REVERSAL_C" class="qf-btn px-2.5 py-1 rounded-md text-[11px] font-semibold bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-500/20 transition">
+            🔄 REVERSAL WAVE C
+          </button>
+          <button type="button" onclick="setQuickFilter('AVOID')" data-qf="AVOID" class="qf-btn px-2.5 py-1 rounded-md text-[11px] font-semibold bg-rose-500/10 text-rose-300 border border-rose-500/30 hover:bg-rose-500/20 transition">
+            🔻 BEARISH / AVOID
+          </button>
+        </div>
+      </div>
+
+      <!-- SUB-HEADER INFO & SORT BAR -->
+      <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
+        <div class="text-slate-400">
+          Menampilkan <strong id="showingCount" class="text-white font-mono">0</strong> dari <strong id="filteredTotalCount" class="text-white font-mono">0</strong> sinyal
+          <span class="mx-1.5 text-slate-600">•</span>
+          <span class="text-sky-400">Klik baris saham untuk membuka Visualizer Elliott Wave &amp; Kalkulator Lot BEI</span>
+        </div>
+
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <span class="text-slate-400 mr-1">Urutkan:</span>
+          <button type="button" onclick="setSortBy('mtfScore')" data-sort="mtfScore" class="sort-btn px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 transition">
+            MTF Score ↓
+          </button>
+          <button type="button" onclick="setSortBy('tfScore')" data-sort="tfScore" class="sort-btn px-2.5 py-1 rounded-md text-xs font-medium bg-surface text-slate-300 border border-slate-800 hover:border-slate-700 transition">
+            Skor TF
+          </button>
+          <button type="button" onclick="setSortBy('price')" data-sort="price" class="sort-btn px-2.5 py-1 rounded-md text-xs font-medium bg-surface text-slate-300 border border-slate-800 hover:border-slate-700 transition">
+            Harga
+          </button>
+          <button type="button" onclick="setSortBy('ticker')" data-sort="ticker" class="sort-btn px-2.5 py-1 rounded-md text-xs font-medium bg-surface text-slate-300 border border-slate-800 hover:border-slate-700 transition">
+            Ticker A-Z
+          </button>
+        </div>
+      </div>
+
+      <!-- MAIN SCREENER DATA TABLE (100% SESUAI KOLOM GOOGLE SHEET ELLIOTT WAVE) -->
+      <div class="bg-surface border border-slate-800/90 rounded-xl overflow-hidden shadow-xl">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse whitespace-nowrap">
+            <thead>
+              <tr class="border-b border-slate-800 bg-obsidian/70 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                <th class="py-3 px-3.5">KODE &amp; SEKTOR</th>
+                <th class="py-3 px-2.5 text-center">TF</th>
+                <th class="py-3 px-2.5 text-center">BIAS</th>
+                <th class="py-3 px-3">KATEGORI WAVE</th>
+                <th class="py-3 px-3">POSISI WAVE</th>
+                <th class="py-3 px-3">FILTER SETUP</th>
+                <th class="py-3 px-3 text-right">HARGA</th>
+                <th class="py-3 px-3 text-right text-slate-400">W0 (ORIGIN)</th>
+                <th class="py-3 px-3 text-right">WAVE 1 (RANGE)</th>
+                <th class="py-3 px-3 text-right text-sky-400">WAVE 2 (38-61.8%)</th>
+                <th class="py-3 px-3 text-right text-amber-400">WAVE 3 (161-261%)</th>
+                <th class="py-3 px-3 text-right text-indigo-300">WAVE 4 (38-61.8%)</th>
+                <th class="py-3 px-3 text-right text-emerald-400">WAVE 5 (61.8-100%)</th>
+                <th class="py-3 px-3 text-right text-purple-300">KOREKSI A-B-C</th>
+                <th class="py-3 px-3 text-right text-rose-400">INVALIDATION / SL</th>
+                <th class="py-3 px-3.5 text-center">SKOR / MTF</th>
+              </tr>
+            </thead>
+            <tbody id="screenerTableBody" class="divide-y divide-slate-800/60 text-xs font-mono">
+              <!-- Baris data dirender dinamis via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination Footer -->
+        <div class="px-4 py-3 bg-obsidian/50 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div class="text-slate-400">
+            Halaman <span id="currentPageLabel" class="text-white font-bold">1</span> dari <span id="totalPagesLabel" class="text-white font-bold">1</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="changePage(-1)" id="prevPageBtn" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-slate-800 disabled:opacity-40 border border-slate-800 text-slate-200 transition">
+              ← Sebelumnya
+            </button>
+            <button type="button" onclick="changePage(1)" id="nextPageBtn" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-slate-800 disabled:opacity-40 border border-slate-800 text-slate-200 transition">
+              Berikutnya →
+            </button>
+          </div>
+        </div>
+      </div>
     </main>
-
-    <footer>
-      <span>© <span id="year"></span> CRTMatrix. Hak cipta dilindungi.</span>
-      <span>DIRANCANG UNTUK EKSPLORASI DIGITAL</span>
-    </footer>
   </div>
 
+  <!-- ======================================================================= -->
+  <!-- 3. MODAL: PENGATURAN API APPS SCRIPT & GOOGLE SHEET                      -->
+  <!-- ======================================================================= -->
+  <div id="apiModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
+    <div class="w-full max-w-xl bg-surface border border-slate-800 rounded-2xl p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-lg">⚙️</span>
+          <h3 class="text-base font-bold text-white">Konfigurasi Koneksi Apps Script &amp; Google Sheet</h3>
+        </div>
+        <button type="button" onclick="closeApiModal()" class="text-slate-400 hover:text-white text-lg leading-none">✕</button>
+      </div>
+
+      <p class="text-xs text-slate-400 leading-relaxed">
+        Aplikasi ini terhubung otomatis ke endpoint <strong>Google Apps Script Web App (`/exec`)</strong> dan file Google Sheet <strong>IDX_ElliottWave_MTF_Scanner_826_Emiten</strong> milik Anda (<code class="text-emerald-400">SCAN_DAILY</code>, <code class="text-sky-400">SCAN_WEEKLY</code>, <code class="text-purple-400">SCAN_MONTHLY</code>).
+      </p>
+
+      <div>
+        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">URL APPS SCRIPT WEB APP (/EXEC)</label>
+        <input
+          id="webAppUrlInput"
+          type="text"
+          value="https://script.google.com/macros/s/AKfycbxCubmhjwMmFh02Y0d28pzH8we_08TS_Hwxn2zMEUhUaanKuZr3qBuaYKXhClp1WnPeqA/exec"
+          class="w-full px-3.5 py-2.5 rounded-xl bg-obsidian border border-slate-800 text-xs font-mono text-sky-300 focus:outline-none focus:border-emerald-500"
+        />
+      </div>
+
+      <div>
+        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">GOOGLE SPREADSHEET ID</label>
+        <input
+          id="sheetIdInput"
+          type="text"
+          value="1wCcK7ojMdoak1tHLfwJF0SGJG-iCg1XGIXN9ixn5yao"
+          class="w-full px-3.5 py-2.5 rounded-xl bg-obsidian border border-slate-800 text-xs font-mono text-emerald-300 focus:outline-none focus:border-emerald-500"
+        />
+        <p class="text-[11px] text-slate-500 mt-1">Jika endpoint /exec belum mengembalikan JSON, sistem otomatis membaca langsung dari Google Sheet di atas.</p>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-end gap-2 pt-2">
+        <button type="button" onclick="loadBuiltInFallback(true)" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 transition">
+          Mode Offline (Sampel)
+        </button>
+        <button type="button" onclick="saveAndSyncSheet()" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-xs font-bold text-slate-950 transition">
+          Simpan &amp; Sinkronkan Sekarang
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- 4. MODAL: VISUALIZER ELLIOTT WAVE & KALKULATOR LOT BEI                  -->
+  <!-- ======================================================================= -->
+  <div id="detailModal" class="fixed inset-0 z-50 hidden items-center justify-center p-3 sm:p-5 bg-black/80 backdrop-blur-sm overflow-y-auto">
+    <div class="w-full max-w-4xl bg-surface border border-slate-800 rounded-2xl shadow-2xl overflow-hidden my-auto">
+      <!-- Header Modal -->
+      <div class="px-5 py-4 bg-obsidian/90 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <span id="modalTfBadge" class="px-2.5 py-1 rounded-md text-xs font-extrabold font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">D</span>
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 id="modalTicker" class="text-xl font-extrabold text-white tracking-tight">BRIS</h2>
+              <span id="modalSector" class="px-2 py-0.5 rounded text-[11px] font-medium bg-sky-500/15 text-sky-300 border border-sky-500/30">Keuangan</span>
+              <span id="modalCategory" class="px-2 py-0.5 rounded text-[11px] font-bold bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">Simple Wave</span>
+            </div>
+            <p id="modalSubPattern" class="text-xs text-slate-400 mt-0.5">Zigzag / Flat Completion • Koreksi Wave C</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeDetailModal()" class="w-8 h-8 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition">✕</button>
+      </div>
+
+      <!-- Body Modal: 2 Kolom (Kiri: Visualizer SVG & Fibonacci Ladder, Kanan: Kalkulator Lot BEI) -->
+      <div class="p-5 grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <!-- Kolom Kiri (7 cols): Visualizer Diagram & Zona Harga Fibonacci -->
+        <div class="lg:col-span-7 space-y-4">
+          <div class="bg-obsidian border border-slate-800/90 rounded-xl p-4">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Proyeksi Struktur Elliott Wave &amp; Zona Fibonacci</span>
+              <span id="modalProbBadge" class="text-[11px] font-mono text-amber-400">Prob: 75%</span>
+            </div>
+            <!-- SVG Visualizer -->
+            <div id="waveVisualizerBox" class="w-full h-52 bg-slate-950/60 rounded-lg border border-slate-800/60 flex items-center justify-center overflow-hidden"></div>
+            <!-- MTF Confluence Strip -->
+            <div class="mt-3 pt-2.5 border-t border-slate-800/80 flex items-center justify-between text-[11px] font-mono">
+              <span class="text-slate-400">MTF Confluence:</span>
+              <span id="modalMtfSummary" class="text-emerald-400 font-semibold">D: Koreksi Wave C | W: Koreksi Wave C | M: Koreksi Wave B</span>
+            </div>
+          </div>
+
+          <!-- Grid 6 Zona Target Harga Fibonacci -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs font-mono">
+            <div class="p-2.5 rounded-lg bg-obsidian border border-slate-800">
+              <div class="text-[10px] text-slate-400">WAVE 1 (INITIAL)</div>
+              <div id="modalW1" class="text-white font-bold mt-0.5">-</div>
+            </div>
+            <div class="p-2.5 rounded-lg bg-obsidian border border-sky-500/30">
+              <div class="text-[10px] text-sky-400">WAVE 2 (38.2%-61.8%)</div>
+              <div id="modalW2" class="text-sky-300 font-bold mt-0.5">-</div>
+            </div>
+            <div class="p-2.5 rounded-lg bg-obsidian border border-amber-500/40">
+              <div class="text-[10px] text-amber-400">WAVE 3 (161.8%-261.8%)</div>
+              <div id="modalW3" class="text-amber-300 font-bold mt-0.5">-</div>
+            </div>
+            <div class="p-2.5 rounded-lg bg-obsidian border border-slate-800">
+              <div class="text-[10px] text-slate-400">WAVE 4 (38.2%-61.8%)</div>
+              <div id="modalW4" class="text-slate-200 font-bold mt-0.5">-</div>
+            </div>
+            <div class="p-2.5 rounded-lg bg-obsidian border border-emerald-500/30">
+              <div class="text-[10px] text-emerald-400">WAVE 5 (61.8%-100%)</div>
+              <div id="modalW5" class="text-emerald-300 font-bold mt-0.5">-</div>
+            </div>
+            <div class="p-2.5 rounded-lg bg-obsidian border border-purple-500/30">
+              <div class="text-[10px] text-purple-400">KOREKSI A | B | C</div>
+              <div id="modalABC" class="text-purple-300 font-bold mt-0.5 text-[11px]">-</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Kolom Kanan (5 cols): Kalkulator Lot & Risk Management BEI -->
+        <div class="lg:col-span-5 bg-obsidian border border-slate-800/90 rounded-xl p-4 flex flex-col justify-between space-y-4">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-emerald-400">🧮 Kalkulator Lot &amp; Risk BEI</h4>
+              <span class="text-[10px] font-mono text-slate-400">1 Lot = 100 lbr</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2.5">
+              <div>
+                <label class="block text-[10px] font-semibold text-slate-400 mb-1">MODAL TRADING (RP)</label>
+                <input id="calcCapital" type="number" value="50000000" step="1000000" oninput="recalculateLot()" class="w-full px-3 py-2 rounded-lg bg-surface border border-slate-800 text-xs font-mono text-white focus:outline-none focus:border-emerald-500" />
+              </div>
+              <div>
+                <label class="block text-[10px] font-semibold text-slate-400 mb-1">RISIKO MAX (%)</label>
+                <input id="calcRiskPct" type="number" value="2" step="0.5" min="0.5" max="10" oninput="recalculateLot()" class="w-full px-3 py-2 rounded-lg bg-surface border border-slate-800 text-xs font-mono text-white focus:outline-none focus:border-emerald-500" />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2.5">
+              <div>
+                <label class="block text-[10px] font-semibold text-slate-400 mb-1">HARGA ENTRY (RP)</label>
+                <input id="calcEntry" type="number" oninput="recalculateLot()" class="w-full px-3 py-2 rounded-lg bg-surface border border-slate-800 text-xs font-mono text-white focus:outline-none focus:border-emerald-500" />
+              </div>
+              <div>
+                <label class="block text-[10px] font-semibold text-rose-400 mb-1">INVALIDATION / SL</label>
+                <input id="calcSL" type="number" oninput="recalculateLot()" class="w-full px-3 py-2 rounded-lg bg-surface border border-rose-500/40 text-xs font-mono text-rose-300 focus:outline-none focus:border-rose-500" />
+              </div>
+            </div>
+
+            <!-- Output Kalkulasi -->
+            <div class="p-3 rounded-xl bg-surface border border-slate-800 space-y-2 text-xs font-mono">
+              <div class="flex justify-between">
+                <span class="text-slate-400">Rekomendasi Beli:</span>
+                <span id="calcResultLots" class="text-emerald-400 font-extrabold">0 Lot</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">Total Nilai Posisi:</span>
+                <span id="calcResultValue" class="text-white font-semibold">Rp 0</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">Batas Risiko (SL):</span>
+                <span id="calcResultRiskRp" class="text-rose-400 font-semibold">-Rp 0</span>
+              </div>
+              <div class="flex justify-between pt-1.5 border-t border-slate-800">
+                <span class="text-slate-400">Potensi Target W3:</span>
+                <span id="calcResultTargetW3" class="text-amber-400 font-bold">+Rp 0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Plan Box -->
+          <div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-xs">
+            <div class="text-[10px] font-bold uppercase text-emerald-400 mb-0.5">Action Plan Sinyal</div>
+            <div id="modalSignalText" class="text-slate-200 font-medium">Zona Akumulasi Akhir Koreksi Wave C</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- JAVASCRIPT ENGINE: DATA SYNC, FILTERING, VISUALIZER & CALCULATOR        -->
+  <!-- ======================================================================= -->
   <script>
-    const canvas = document.querySelector("#matrix");
-    const context = canvas.getContext("2d");
-    const characters = "アイウエオカキクケコサシスセソタチツテト0123456789";
-    const fontSize = 15;
-    let columns = 0;
-    let drops = [];
+    // =========================================================================
+    // 1. STATE APLIKASI & KONFIGURASI DEFAULT MILIK PENGGUNA
+    // =========================================================================
+    const DEFAULT_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxCubmhjwMmFh02Y0d28pzH8we_08TS_Hwxn2zMEUhUaanKuZr3qBuaYKXhClp1WnPeqA/exec';
+    const DEFAULT_SHEET_ID = '1wCcK7ojMdoak1tHLfwJF0SGJG-iCg1XGIXN9ixn5yao';
+    const PAGE_SIZE = 100;
 
-    function resizeCanvas() {
-      const ratio = window.devicePixelRatio || 1;
-      canvas.width = window.innerWidth * ratio;
-      canvas.height = window.innerHeight * ratio;
-      canvas.style.width = `${window.innerWidth}px`;
-      canvas.style.height = `${window.innerHeight}px`;
-      context.setTransform(ratio, 0, 0, ratio, 0, 0);
-      columns = Math.ceil(window.innerWidth / fontSize);
-      drops = Array(columns).fill(1);
+    let appState = {
+      webAppUrl: localStorage.getItem('ewmatrix_webapp_url') || DEFAULT_WEBAPP_URL,
+      sheetId: localStorage.getItem('ewmatrix_sheet_id') || DEFAULT_SHEET_ID,
+      username: localStorage.getItem('ewmatrix_user') || 'Trader IDX',
+      allSignals: [],
+      filteredSignals: [],
+      tfFilter: 'ALL',      // 'ALL' | 'D' | 'W' | 'M'
+      quickFilter: 'ALL',   // 'ALL' | 'EARLY_W3' | 'W3_MOMENTUM' | 'W2_GOLDEN' | 'W4_PULLBACK' | 'DIAGONAL' | 'REVERSAL_C' | 'AVOID'
+      sortBy: 'mtfScore',   // 'mtfScore' | 'tfScore' | 'price' | 'ticker'
+      currentPage: 1,
+      isLiveConnected: false
+    };
+
+    // =========================================================================
+    // 2. TOAST NOTIFICATION HELPER (NO ALERT)
+    // =========================================================================
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      const colors = {
+        success: 'bg-emerald-950/95 border-emerald-500/50 text-emerald-200',
+        warning: 'bg-amber-950/95 border-amber-500/50 text-amber-200',
+        error: 'bg-rose-950/95 border-rose-500/50 text-rose-200',
+        info: 'bg-slate-900/95 border-slate-700 text-slate-200'
+      };
+      toast.className = `pointer-events-auto px-4 py-3 rounded-xl border shadow-xl text-xs font-medium backdrop-blur-md transition-all duration-300 ${colors[type] || colors.info}`;
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(8px)';
+        setTimeout(() => toast.remove(), 300);
+      }, 3800);
     }
 
-    function drawMatrix() {
-      context.fillStyle = "rgba(5, 9, 7, 0.08)";
-      context.fillRect(0, 0, window.innerWidth, window.innerHeight);
-      context.fillStyle = "#67ff9a";
-      context.font = `${fontSize}px monospace`;
+    // =========================================================================
+    // 3. AUTENTIKASI & NAVIGASI VIEW
+    // =========================================================================
+    function togglePasswordVisibility() {
+      const pwd = document.getElementById('passwordInput');
+      const btn = document.getElementById('togglePwdBtn');
+      if (pwd.type === 'password') {
+        pwd.type = 'text';
+        btn.textContent = 'Sembunyikan';
+      } else {
+        pwd.type = 'password';
+        btn.textContent = 'Lihat';
+      }
+    }
 
-      drops.forEach((y, index) => {
-        const character = characters[Math.floor(Math.random() * characters.length)];
-        context.fillText(character, index * fontSize, y * fontSize);
+    function handleLogin(e) {
+      e.preventDefault();
+      const rawUser = document.getElementById('usernameInput').value.trim() || 'Trader IDX';
+      appState.username = rawUser;
 
-        if (y * fontSize > window.innerHeight && Math.random() > 0.975) {
-          drops[index] = 0;
+      if (document.getElementById('rememberMeCheckbox').checked) {
+        localStorage.setItem('ewmatrix_logged_in', 'true');
+        localStorage.setItem('ewmatrix_user', rawUser);
+      }
+      enterDashboard();
+    }
+
+    function enterDemoMode() {
+      appState.username = 'Trader IDX';
+      enterDashboard();
+    }
+
+    function enterDashboard() {
+      document.getElementById('loginView').classList.add('hidden');
+      document.getElementById('appView').classList.remove('hidden');
+      fetchAllTimeframes(false);
+    }
+
+    function handleLogout() {
+      localStorage.removeItem('ewmatrix_logged_in');
+      document.getElementById('appView').classList.add('hidden');
+      document.getElementById('loginView').classList.remove('hidden');
+      showToast('Anda telah keluar dari sesi EWMatrix.', 'info');
+    }
+
+    // =========================================================================
+    // 4. PENGAMBILAN DATA LANGSUNG DARI GOOGLE SHEET (DAILY, WEEKLY, MONTHLY)
+    // =========================================================================
+    async function fetchGoogleSheetTab(sheetId, sheetName, tfCode) {
+      const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}`;
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const text = await response.text();
+      // Ekstrak JSON dari wrapper google.visualization.Query.setResponse(...)
+      const jsonMatch = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);?/);
+      if (!jsonMatch || !jsonMatch[1]) throw new Error('Format respons Google Sheet tidak valid');
+      const data = JSON.parse(jsonMatch[1]);
+      if (!data.table || !data.table.rows) return [];
+
+      const parsed = [];
+      for (let i = 0; i < data.table.rows.length; i++) {
+        const c = data.table.rows[i].c;
+        if (!c || !c[1] || !c[1].v) continue;
+
+        const ticker = String(c[1].v).trim().toUpperCase();
+        if (ticker === 'TICKER') continue;
+
+        const sektor = c[2] && c[2].v ? String(c[2].v).trim() : '-';
+        const tfScore = c[3] && typeof c[3].v === 'number' ? Math.round(c[3].v) : 0;
+        const filterTag = c[4] && c[4].v ? String(c[4].v).trim() : '-';
+        const lastPrice = c[5] && typeof c[5].v === 'number' ? Math.round(c[5].v) : 0;
+        const trendBias = c[6] && c[6].v ? String(c[6].v).trim() : 'N/A';
+        const waveCategory = c[7] && c[7].v ? String(c[7].v).trim() : 'Simple Wave';
+        const subPattern = c[8] && c[8].v ? String(c[8].v).trim() : '-';
+        const currentWave = c[9] && c[9].v ? String(c[9].v).trim() : '-';
+        const fiboProb = c[10] && c[10].v ? String(c[10].v).trim() : '-';
+        const w0 = c[11] && typeof c[11].v === 'number' ? Math.round(c[11].v) : 0;
+        const w1Range = c[12] && c[12].v ? String(c[12].v).trim() : '-';
+        const w2Range = c[13] && c[13].v ? String(c[13].v).trim() : '-';
+        const w3Range = c[14] && c[14].v ? String(c[14].v).trim() : '-';
+        const w4Range = c[15] && c[15].v ? String(c[15].v).trim() : '-';
+        const w5Range = c[16] && c[16].v ? String(c[16].v).trim() : '-';
+        const abcRange = c[17] && c[17].v ? String(c[17].v).trim() : '-';
+        const invalidation = c[18] && typeof c[18].v === 'number' ? Math.round(c[18].v) : 0;
+        const signal = c[19] && c[19].v ? String(c[19].v).trim() : '-';
+        const mtfScore = c[20] && typeof c[20].v === 'number' ? Math.round(c[20].v) : tfScore;
+        const mtfConfluence = c[21] && c[21].v ? String(c[21].v).trim() : `${tfCode}: ${currentWave}`;
+
+        parsed.push({
+          id: `${ticker}_${tfCode}`,
+          ticker,
+          sektor,
+          tf: tfCode,
+          tfScore,
+          filterTag,
+          lastPrice,
+          trendBias,
+          waveCategory,
+          subPattern,
+          currentWave,
+          fiboProb,
+          w0,
+          w1Range,
+          w2Range,
+          w3Range,
+          w4Range,
+          w5Range,
+          abcRange,
+          invalidation,
+          signal,
+          mtfScore,
+          mtfConfluence
+        });
+      }
+      return parsed;
+    }
+
+    async function fetchFromWebAppApi(webAppUrl) {
+      if (!webAppUrl) throw new Error('URL Web App kosong');
+      const endpoint = `${webAppUrl}${webAppUrl.includes('?') ? '&' : '?'}action=getData`;
+      const response = await fetch(endpoint);
+      if (!response.ok) throw new Error(`API HTTP ${response.status}`);
+      const json = await response.json();
+      if (!json || !Array.isArray(json.signals) || json.signals.length === 0) {
+        throw new Error('Data signals dari Web App kosong');
+      }
+      return json.signals;
+    }
+
+    async function fetchAllTimeframes(isManualRefresh = false) {
+      const statusDot = document.getElementById('statusDot');
+      const statusText = document.getElementById('statusText');
+      const refreshIcon = document.getElementById('refreshIcon');
+
+      statusDot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-ping';
+      statusText.textContent = 'Menyinkronkan data Elliott Wave (Daily, Weekly, Monthly)...';
+      if (refreshIcon) refreshIcon.classList.add('animate-spin');
+
+      try {
+        let combined = [];
+        let sourceLabel = '';
+
+        // 1. Coba ambil dari Google Apps Script Web App (/exec)
+        try {
+          combined = await fetchFromWebAppApi(appState.webAppUrl);
+          sourceLabel = 'Apps Script API (/exec)';
+        } catch (apiErr) {
+          // 2. Fallback langsung ke 3 tab Google Sheet via Google Visualization API
+          const [dailyData, weeklyData, monthlyData] = await Promise.all([
+            fetchGoogleSheetTab(appState.sheetId, 'SCAN_DAILY', 'D'),
+            fetchGoogleSheetTab(appState.sheetId, 'SCAN_WEEKLY', 'W'),
+            fetchGoogleSheetTab(appState.sheetId, 'SCAN_MONTHLY', 'M')
+          ]);
+          combined = [...dailyData, ...weeklyData, ...monthlyData];
+          sourceLabel = 'Google Sheet (D • W • M)';
         }
-        drops[index]++;
-      });
+
+        if (!combined || combined.length === 0) {
+          throw new Error('Tidak ada baris data yang terbaca');
+        }
+
+        appState.allSignals = combined;
+        appState.isLiveConnected = true;
+
+        const nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        statusDot.className = 'w-2 h-2 rounded-full bg-emerald-400';
+        statusText.textContent = `TERHUBUNG (${sourceLabel}): ${combined.length.toLocaleString('id-ID')} sinyal • Sync ${nowStr}`;
+        document.getElementById('apiModeLabel').textContent = 'API: LIVE';
+
+        populateSectorDropdown();
+        updateKpiCards();
+        applyFilters();
+
+        if (isManualRefresh) {
+          showToast(`Berhasil memuat ${combined.length.toLocaleString('id-ID')} sinyal Elliott Wave.`, 'success');
+        }
+      } catch (err) {
+        // 3. Jika Sheet masih private / sandbox memblokir jaringan, muat data sampel representatif
+        loadBuiltInFallback(isManualRefresh);
+      } finally {
+        if (refreshIcon) refreshIcon.classList.remove('animate-spin');
+      }
     }
 
-    resizeCanvas();
-    window.addEventListener("resize", resizeCanvas);
-    window.setInterval(drawMatrix, 55);
-    document.querySelector("#year").textContent = new Date().getFullYear();
+    // =========================================================================
+    // 5. DATA SAMPEL REPRESENTATIF (JIKA SHEET PRIVATE / MODE OFFLINE)
+    // =========================================================================
+    function loadBuiltInFallback(showNotification = false) {
+      const sampleBase = [
+        { ticker: 'BRIS', sektor: 'Keuangan', lastPrice: 2890, trendBias: 'BULLISH', waveCategory: 'Impulse Wave', subPattern: 'Extended Wave 3', currentWave: 'Wave 3', fiboProb: '70%', w0: 2150, w1Range: '2.150 - 2.480', w2Range: '2.280 - 2.350', w3Range: '3.010 - 3.340', w4Range: '2.820 - 2.940', w5Range: '3.350 - 3.680', abcRange: '2.750 - 2.520', invalidation: 2270, tfScore: 92, mtfScore: 89, filterTag: '🔥 EARLY WAVE 3 IMPULSE', signal: 'Breakout Awal Wave 3 Impulse (Konfirmasi Volume)' },
+        { ticker: 'PTBA', sektor: 'Energi', lastPrice: 2740, trendBias: 'BULLISH', waveCategory: 'Impulse Wave', subPattern: 'Standard 5-Wave', currentWave: 'Wave 2', fiboProb: '70%', w0: 2380, w1Range: '2.380 - 2.860', w2Range: '2.560 - 2.680', w3Range: '3.340 - 3.820', w4Range: '3.120 - 3.290', w5Range: '3.780 - 4.120', abcRange: '3.050 - 2.810', invalidation: 2380, tfScore: 84, mtfScore: 81, filterTag: '🎯 WAVE 2 GOLDEN ZONE', signal: 'Retracement 50%-61.8% Wave 1 — Siap Rebound Wave 3' },
+        { ticker: 'BBCA', sektor: 'Keuangan', lastPrice: 10125, trendBias: 'BULLISH', waveCategory: 'Impulse Wave', subPattern: 'Extended Wave 3', currentWave: 'Wave 3', fiboProb: '75%', w0: 8850, w1Range: '8.850 - 9.450', w2Range: '9.075 - 9.225', w3Range: '10.050 - 10.650', w4Range: '9.850 - 10.025', w5Range: '10.750 - 11.250', abcRange: '9.700 - 9.300', invalidation: 9075, tfScore: 86, mtfScore: 84, filterTag: '⚡ WAVE 3 MOMENTUM', signal: 'Wave 3 Aktif Menuju Ekstensi 161.8%' },
+        { ticker: 'ANTM', sektor: 'Barang Baku', lastPrice: 1585, trendBias: 'BULLISH', waveCategory: 'Diagonal Wave', subPattern: 'Leading Diagonal', currentWave: 'Wave 4', fiboProb: '70%', w0: 1260, w1Range: '1.260 - 1.440', w2Range: '1.330 - 1.370', w3Range: '1.520 - 1.660', w4Range: '1.490 - 1.540', w5Range: '1.680 - 1.790', abcRange: '1.460 - 1.380', invalidation: 1440, tfScore: 76, mtfScore: 74, filterTag: '📈 WAVE 4 PULLBACK', signal: 'Pullback Sehat Wave 4 Menuju Target Wave 5' },
+        { ticker: 'AMMN', sektor: 'Barang Baku', lastPrice: 9450, trendBias: 'BULLISH', waveCategory: 'Impulse Wave', subPattern: 'Extended Wave 3', currentWave: 'Wave 3', fiboProb: '75%', w0: 7600, w1Range: '7.600 - 8.450', w2Range: '7.925 - 8.125', w3Range: '9.300 - 10.150', w4Range: '8.950 - 9.250', w5Range: '10.200 - 10.950', abcRange: '8.800 - 8.300', invalidation: 7925, tfScore: 88, mtfScore: 85, filterTag: '🔥 EARLY WAVE 3 IMPULSE', signal: 'Ekspansi Wave 3 Impulse Tembus Puncak Wave 1' },
+        { ticker: 'BBRI', sektor: 'Keuangan', lastPrice: 4680, trendBias: 'BULLISH', waveCategory: 'Simple Wave', subPattern: 'Zigzag (5-3-5)', currentWave: 'Koreksi Wave C', fiboProb: '70%', w0: 5450, w1Range: '5.450 - 4.920', w2Range: '5.120 - 5.240', w3Range: '4.580 - 4.720', w4Range: '4.780 - 4.860', w5Range: '4.450 - 4.620', abcRange: '4.920 | 5.180 | 4.650', invalidation: 4490, tfScore: 68, mtfScore: 67, filterTag: '🔄 REVERSAL WAVE C', signal: 'Zona Akumulasi Akhir Koreksi Wave C (100% Fibo)' },
+        { ticker: 'BMRI', sektor: 'Keuangan', lastPrice: 6350, trendBias: 'BULLISH', waveCategory: 'Simple Wave', subPattern: 'Regular Flat (3-3-5)', currentWave: 'Koreksi Wave C', fiboProb: '70%', w0: 7100, w1Range: '7.100 - 6.450', w2Range: '6.700 - 6.850', w3Range: '6.250 - 6.400', w4Range: '6.500 - 6.620', w5Range: '6.150 - 6.320', abcRange: '6.450 | 6.820 | 6.300', invalidation: 6120, tfScore: 66, mtfScore: 65, filterTag: '🔄 REVERSAL WAVE C', signal: 'Potensi Reversal Bullish di Ujung Wave C' },
+        { ticker: 'ADRO', sektor: 'Energi', lastPrice: 2420, trendBias: 'BULLISH', waveCategory: 'Diagonal Wave', subPattern: 'Ending Diagonal', currentWave: 'Wave 5', fiboProb: '70%', w0: 1920, w1Range: '1.920 - 2.120', w2Range: '1.995 - 2.045', w3Range: '2.240 - 2.360', w4Range: '2.160 - 2.220', w5Range: '2.380 - 2.490', abcRange: '2.210 - 2.080', invalidation: 2160, tfScore: 72, mtfScore: 70, filterTag: '📐 DIAGONAL SETUP', signal: 'Wave 5 Diagonal Mendekati Target Ekstensi 61.8%' },
+        { ticker: 'TLKM', sektor: 'Infrastruktur', lastPrice: 2810, trendBias: 'BULLISH', waveCategory: 'Complex Wave', subPattern: 'Double Three (W-X-Y)', currentWave: 'Koreksi Wave C', fiboProb: '65%', w0: 3280, w1Range: '3.280 - 2.910', w2Range: '3.050 - 3.140', w3Range: '2.760 - 2.860', w4Range: '2.900 - 2.980', w5Range: '2.700 - 2.800', abcRange: '2.910 | 3.110 | 2.790', invalidation: 2680, tfScore: 63, mtfScore: 61, filterTag: '🔄 REVERSAL WAVE C', signal: 'Kompleksi Koreksi W-X-Y Mendekati Support Utama' },
+        { ticker: 'ICBP', sektor: 'Barang Konsumen Primer', lastPrice: 11450, trendBias: 'BULLISH', waveCategory: 'Impulse Wave', subPattern: 'Standard 5-Wave', currentWave: 'Wave 2', fiboProb: '70%', w0: 10200, w1Range: '10.200 - 11.950', w2Range: '10.875 - 11.275', w3Range: '13.025 - 14.775', w4Range: '12.350 - 12.900', w5Range: '14.500 - 15.650', abcRange: '12.100 - 11.350', invalidation: 10200, tfScore: 81, mtfScore: 79, filterTag: '🎯 WAVE 2 GOLDEN ZONE', signal: 'Retracement Sehat Wave 2 di Area 38.2%-50%' },
+        { ticker: 'GOTO', sektor: 'Teknologi', lastPrice: 66, trendBias: 'BEARISH', waveCategory: 'Complex Wave', subPattern: 'Triple Three (W-X-Y-X-Z)', currentWave: 'Koreksi Wave B', fiboProb: '60%', w0: 84, w1Range: '84 - 64', w2Range: '72 - 76', w3Range: '54 - 62', w4Range: '63 - 68', w5Range: '50 - 58', abcRange: '64 | 71 | 58', invalidation: 74, tfScore: 34, mtfScore: 36, filterTag: '🔻 BEARISH / AVOID', signal: 'Pantulan Wave B Bearish — Hindari Entry Agresif' },
+        { ticker: 'ASII', sektor: 'Perindustrian', lastPrice: 4920, trendBias: 'BEARISH', waveCategory: 'Simple Wave', subPattern: 'Zigzag (5-3-5)', currentWave: 'Koreksi Wave A', fiboProb: '65%', w0: 5400, w1Range: '5.400 - 4.880', w2Range: '5.080 - 5.200', w3Range: '4.520 - 4.740', w4Range: '4.800 - 4.920', w5Range: '4.400 - 4.600', abcRange: '4.880 | 5.140 | 4.620', invalidation: 5220, tfScore: 32, mtfScore: 35, filterTag: '🔻 BEARISH / AVOID', signal: 'Tekanan Turun Wave A — Tunggu Selesai Wave C' }
+      ];
+
+      const tfs = ['D', 'W', 'M'];
+      const generated = [];
+      tfs.forEach((tf, idx) => {
+        sampleBase.forEach(item => {
+          const adjScore = Math.max(20, Math.min(98, item.tfScore - idx * 3));
+          generated.push({
+            ...item,
+            id: `${item.ticker}_${tf}`,
+            tf,
+            tfScore: adjScore,
+            mtfConfluence: `D: ${item.currentWave} | W: ${item.currentWave} | M: ${item.trendBias === 'BULLISH' ? 'Wave 3' : 'Koreksi Wave B'}`
+          });
+        });
+      });
+
+      appState.allSignals = generated;
+      appState.isLiveConnected = false;
+
+      document.getElementById('statusDot').className = 'w-2 h-2 rounded-full bg-amber-400';
+      document.getElementById('statusText').textContent = `MODE SAMPEL (${generated.length} sinyal) • Pastikan akses Sheet "Siapa saja yang memiliki link" untuk live sync`;
+      document.getElementById('apiModeLabel').textContent = 'API: DEMO';
+
+      populateSectorDropdown();
+      updateKpiCards();
+      applyFilters();
+
+      if (showNotification) {
+        showToast('Memuat data sampel Elliott Wave Multi-Timeframe.', 'warning');
+      }
+    }
+
+    // =========================================================================
+    // 6. POPULATE SEKTOR & UPDATE 5 KARTU KPI
+    // =========================================================================
+    function populateSectorDropdown() {
+      const select = document.getElementById('sectorFilter');
+      const currentVal = select.value;
+      const counts = {};
+      appState.allSignals.forEach(s => {
+        if (s.sektor && s.sektor !== '-') {
+          counts[s.sektor] = (counts[s.sektor] || 0) + 1;
+        }
+      });
+
+      const sectors = Object.keys(counts).sort();
+      select.innerHTML = `<option value="ALL">Sektor: Semua (${appState.allSignals.length.toLocaleString('id-ID')})</option>`;
+      sectors.forEach(sec => {
+        const opt = document.createElement('option');
+        opt.value = sec;
+        opt.textContent = `${sec} (${counts[sec]})`;
+        select.appendChild(opt);
+      });
+
+      if (sectors.includes(currentVal)) {
+        select.value = currentVal;
+      }
+    }
+
+    function updateKpiCards() {
+      const data = appState.allSignals;
+      const total = data.length;
+      const dCount = data.filter(x => x.tf === 'D').length;
+      const wCount = data.filter(x => x.tf === 'W').length;
+      const mCount = data.filter(x => x.tf === 'M').length;
+
+      const priorityCount = data.filter(x => x.mtfScore >= 55).length;
+      const priorityPct = total > 0 ? Math.round((priorityCount / total) * 100) : 0;
+
+      const impCount = data.filter(x => x.waveCategory === 'Impulse Wave').length;
+      const diagCount = data.filter(x => x.waveCategory === 'Diagonal Wave').length;
+      const motiveCount = impCount + diagCount;
+
+      const simpCount = data.filter(x => x.waveCategory === 'Simple Wave').length;
+      const compCount = data.filter(x => x.waveCategory === 'Complex Wave').length;
+      const corrCount = simpCount + compCount;
+
+      const w3Count = data.filter(x => x.currentWave.includes('Wave 3')).length;
+      const revCCount = data.filter(x => x.currentWave.includes('Wave C') && x.trendBias === 'BULLISH').length;
+
+      document.getElementById('kpiTotal').textContent = total.toLocaleString('id-ID');
+      document.getElementById('kpiTotalSub').textContent = `D:${dCount} • W:${wCount} • M:${mCount}`;
+
+      document.getElementById('kpiPriority').textContent = priorityCount.toLocaleString('id-ID');
+      document.getElementById('kpiPriorityPct').textContent = `${priorityPct}% aktif`;
+
+      document.getElementById('kpiMotive').textContent = motiveCount.toLocaleString('id-ID');
+      document.getElementById('kpiMotiveSub').textContent = `${impCount} imp / ${diagCount} diag`;
+
+      document.getElementById('kpiCorrective').textContent = corrCount.toLocaleString('id-ID');
+      document.getElementById('kpiCorrectiveSub').textContent = `${simpCount} simp / ${compCount} comp`;
+
+      document.getElementById('kpiOpportunity').textContent = (w3Count + revCCount).toLocaleString('id-ID');
+      document.getElementById('kpiOpportunitySub').textContent = `W3:${w3Count} • RevC:${revCCount}`;
+    }
+
+    // =========================================================================
+    // 7. FILTERING & SORTING ENGINE
+    // =========================================================================
+    function setTimeframeFilter(tf) {
+      appState.tfFilter = tf;
+      document.querySelectorAll('.tf-btn').forEach(btn => {
+        if (btn.dataset.tf === tf) {
+          btn.className = 'tf-btn px-3 py-1.5 rounded-md text-xs font-bold bg-emerald-500 text-slate-950 transition';
+        } else {
+          btn.className = 'tf-btn px-3 py-1.5 rounded-md text-xs font-semibold text-slate-400 hover:text-white transition';
+        }
+      });
+      applyFilters();
+    }
+
+    function setQuickFilter(qf) {
+      appState.quickFilter = qf;
+      document.querySelectorAll('.qf-btn').forEach(btn => {
+        if (btn.dataset.qf === qf) {
+          btn.classList.add('ring-2', 'ring-emerald-400/70');
+        } else {
+          btn.classList.remove('ring-2', 'ring-emerald-400/70');
+        }
+      });
+      applyFilters();
+    }
+
+    function setSortBy(sortKey) {
+      appState.sortBy = sortKey;
+      document.querySelectorAll('.sort-btn').forEach(btn => {
+        if (btn.dataset.sort === sortKey) {
+          btn.className = 'sort-btn px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 transition';
+        } else {
+          btn.className = 'sort-btn px-2.5 py-1 rounded-md text-xs font-medium bg-surface text-slate-300 border border-slate-800 hover:border-slate-700 transition';
+        }
+      });
+      applyFilters();
+    }
+
+    function resetAllFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('sectorFilter').value = 'ALL';
+      document.getElementById('categoryFilter').value = 'ALL';
+      document.getElementById('wavePosFilter').value = 'ALL';
+      setTimeframeFilter('ALL');
+      setQuickFilter('ALL');
+      setSortBy('mtfScore');
+    }
+
+    function applyFilters() {
+      const searchQ = document.getElementById('searchInput').value.trim().toUpperCase();
+      const sectorVal = document.getElementById('sectorFilter').value;
+      const catVal = document.getElementById('categoryFilter').value;
+      const posVal = document.getElementById('wavePosFilter').value;
+
+      let res = appState.allSignals.filter(item => {
+        if (appState.tfFilter !== 'ALL' && item.tf !== appState.tfFilter) return false;
+        if (searchQ && !item.ticker.includes(searchQ) && !item.sektor.toUpperCase().includes(searchQ)) return false;
+        if (sectorVal !== 'ALL' && item.sektor !== sectorVal) return false;
+        if (catVal !== 'ALL' && item.waveCategory !== catVal) return false;
+        if (posVal !== 'ALL' && item.currentWave !== posVal) return false;
+
+        // Quick Filter Chips
+        if (appState.quickFilter === 'EARLY_W3' && !item.filterTag.includes('EARLY WAVE 3')) return false;
+        if (appState.quickFilter === 'W3_MOMENTUM' && !item.filterTag.includes('WAVE 3 MOMENTUM')) return false;
+        if (appState.quickFilter === 'W2_GOLDEN' && !item.filterTag.includes('WAVE 2 GOLDEN')) return false;
+        if (appState.quickFilter === 'W4_PULLBACK' && !item.filterTag.includes('WAVE 4 PULLBACK')) return false;
+        if (appState.quickFilter === 'DIAGONAL' && item.waveCategory !== 'Diagonal Wave') return false;
+        if (appState.quickFilter === 'REVERSAL_C' && !item.filterTag.includes('REVERSAL WAVE C')) return false;
+        if (appState.quickFilter === 'AVOID' && item.trendBias !== 'BEARISH') return false;
+
+        return true;
+      });
+
+      // Sorting
+      res.sort((a, b) => {
+        if (appState.sortBy === 'mtfScore') return b.mtfScore - a.mtfScore || b.tfScore - a.tfScore;
+        if (appState.sortBy === 'tfScore') return b.tfScore - a.tfScore;
+        if (appState.sortBy === 'price') return b.lastPrice - a.lastPrice;
+        if (appState.sortBy === 'ticker') return a.ticker.localeCompare(b.ticker);
+        return 0;
+      });
+
+      appState.filteredSignals = res;
+      appState.currentPage = 1;
+      renderTable();
+    }
+
+    // =========================================================================
+    // 8. RENDER DATA TABLE & PAGINATION
+    // =========================================================================
+    function formatNum(n) {
+      if (!n || isNaN(n)) return '-';
+      return Number(n).toLocaleString('id-ID');
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('screenerTableBody');
+      const total = appState.filteredSignals.length;
+      const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+      if (appState.currentPage > totalPages) appState.currentPage = totalPages;
+
+      const startIdx = (appState.currentPage - 1) * PAGE_SIZE;
+      const pageItems = appState.filteredSignals.slice(startIdx, startIdx + PAGE_SIZE);
+
+      document.getElementById('showingCount').textContent = pageItems.length.toLocaleString('id-ID');
+      document.getElementById('filteredTotalCount').textContent = total.toLocaleString('id-ID');
+      document.getElementById('currentPageLabel').textContent = appState.currentPage;
+      document.getElementById('totalPagesLabel').textContent = totalPages;
+
+      document.getElementById('prevPageBtn').disabled = appState.currentPage <= 1;
+      document.getElementById('nextPageBtn').disabled = appState.currentPage >= totalPages;
+
+      if (pageItems.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="16" class="py-12 text-center text-slate-400 font-sans">
+              Tidak ada emiten yang cocok dengan kombinasi filter saat ini. Klik <strong>Reset</strong> untuk menampilkan semua sinyal.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = pageItems.map(item => {
+        const tfBadgeClass = item.tf === 'D'
+          ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
+          : item.tf === 'W'
+            ? 'bg-sky-500/15 text-sky-300 border-sky-500/30'
+            : 'bg-purple-500/15 text-purple-300 border-purple-500/30';
+
+        const biasBadge = item.trendBias === 'BULLISH'
+          ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">BULLISH</span>`
+          : item.trendBias === 'BEARISH'
+            ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/15 text-rose-400 border border-rose-500/30">BEARISH</span>`
+            : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-400">N/A</span>`;
+
+        const catBadgeClass = item.waveCategory === 'Impulse Wave'
+          ? 'text-emerald-300 bg-emerald-500/10 border-emerald-500/30'
+          : item.waveCategory === 'Diagonal Wave'
+            ? 'text-purple-300 bg-purple-500/10 border-purple-500/30'
+            : item.waveCategory === 'Simple Wave'
+              ? 'text-sky-300 bg-sky-500/10 border-sky-500/30'
+              : 'text-amber-300 bg-amber-500/10 border-amber-500/30';
+
+        const scoreColor = item.mtfScore >= 80
+          ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+          : item.mtfScore >= 55
+            ? 'bg-sky-500/20 text-sky-300 border-sky-500/40'
+            : 'bg-slate-800 text-slate-300 border-slate-700';
+
+        return `
+          <tr onclick="openDetailModal('${item.id}')" class="hover:bg-slate-800/50 cursor-pointer transition-colors group">
+            <td class="py-2.5 px-3.5">
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-white group-hover:text-emerald-400 transition">${item.ticker}</span>
+                <span class="px-1.5 py-0.5 rounded text-[10px] font-sans bg-sky-500/10 text-sky-300 border border-sky-500/20 truncate max-w-[135px]">${item.sektor}</span>
+              </div>
+            </td>
+            <td class="py-2.5 px-2.5 text-center">
+              <span class="inline-block w-6 py-0.5 rounded text-[10px] font-extrabold border ${tfBadgeClass}">${item.tf}</span>
+            </td>
+            <td class="py-2.5 px-2.5 text-center">${biasBadge}</td>
+            <td class="py-2.5 px-3">
+              <span class="px-2 py-0.5 rounded text-[10px] font-semibold border ${catBadgeClass}">${item.waveCategory}</span>
+            </td>
+            <td class="py-2.5 px-3 font-semibold text-slate-200">${item.currentWave}</td>
+            <td class="py-2.5 px-3 text-[11px] text-slate-300">${item.filterTag}</td>
+            <td class="py-2.5 px-3 text-right font-bold text-white tabular-nums">${formatNum(item.lastPrice)}</td>
+            <td class="py-2.5 px-3 text-right text-slate-400 tabular-nums">${formatNum(item.w0)}</td>
+            <td class="py-2.5 px-3 text-right text-slate-300 tabular-nums">${item.w1Range}</td>
+            <td class="py-2.5 px-3 text-right text-sky-300 tabular-nums">${item.w2Range}</td>
+            <td class="py-2.5 px-3 text-right font-semibold text-amber-300 tabular-nums">${item.w3Range}</td>
+            <td class="py-2.5 px-3 text-right text-indigo-300 tabular-nums">${item.w4Range}</td>
+            <td class="py-2.5 px-3 text-right text-emerald-300 tabular-nums">${item.w5Range}</td>
+            <td class="py-2.5 px-3 text-right text-purple-300 tabular-nums">${item.abcRange}</td>
+            <td class="py-2.5 px-3 text-right font-semibold text-rose-400 tabular-nums">${formatNum(item.invalidation)}</td>
+            <td class="py-2.5 px-3.5 text-center">
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold border ${scoreColor}">
+                <span>${item.tfScore}</span>
+                <span class="opacity-50">/</span>
+                <span>${item.mtfScore}</span>
+              </span>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function changePage(delta) {
+      appState.currentPage += delta;
+      renderTable();
+    }
+
+    // =========================================================================
+    // 9. MODAL API CONFIGURATION
+    // =========================================================================
+    function openApiModal() {
+      document.getElementById('webAppUrlInput').value = appState.webAppUrl;
+      document.getElementById('sheetIdInput').value = appState.sheetId;
+      const modal = document.getElementById('apiModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeApiModal() {
+      const modal = document.getElementById('apiModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function saveAndSyncSheet() {
+      const urlVal = document.getElementById('webAppUrlInput').value.trim();
+      const idVal = document.getElementById('sheetIdInput').value.trim();
+      appState.webAppUrl = urlVal;
+      appState.sheetId = idVal;
+      localStorage.setItem('ewmatrix_webapp_url', urlVal);
+      localStorage.setItem('ewmatrix_sheet_id', idVal);
+      closeApiModal();
+      if (!document.getElementById('appView').classList.contains('hidden')) {
+        fetchAllTimeframes(true);
+      } else {
+        showToast('Konfigurasi API & Spreadsheet ID disimpan.', 'success');
+      }
+    }
+
+    // =========================================================================
+    // 10. MODAL DETAIL: VISUALIZER ELLIOTT WAVE SVG & KALKULATOR LOT BEI
+    // =========================================================================
+    let activeModalItem = null;
+
+    function openDetailModal(signalId) {
+      const item = appState.allSignals.find(x => x.id === signalId);
+      if (!item) return;
+      activeModalItem = item;
+
+      document.getElementById('modalTfBadge').textContent = item.tf;
+      document.getElementById('modalTicker').textContent = item.ticker;
+      document.getElementById('modalSector').textContent = item.sektor;
+      document.getElementById('modalCategory').textContent = item.waveCategory;
+      document.getElementById('modalSubPattern').textContent = `${item.subPattern} • ${item.currentWave}`;
+      document.getElementById('modalProbBadge').textContent = `Probabilitas Fibo: ${item.fiboProb}`;
+      document.getElementById('modalMtfSummary').textContent = item.mtfConfluence;
+
+      document.getElementById('modalW1').textContent = item.w1Range;
+      document.getElementById('modalW2').textContent = item.w2Range;
+      document.getElementById('modalW3').textContent = item.w3Range;
+      document.getElementById('modalW4').textContent = item.w4Range;
+      document.getElementById('modalW5').textContent = item.w5Range;
+      document.getElementById('modalABC').textContent = item.abcRange;
+      document.getElementById('modalSignalText').textContent = item.signal;
+
+      // Isi input kalkulator otomatis dari harga & SL saham
+      document.getElementById('calcEntry').value = item.lastPrice || 1000;
+      document.getElementById('calcSL').value = item.invalidation || Math.round((item.lastPrice || 1000) * 0.93);
+      recalculateLot();
+
+      // Render diagram SVG Elliott Wave
+      renderWaveVisualizerSVG(item);
+
+      const modal = document.getElementById('detailModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeDetailModal() {
+      const modal = document.getElementById('detailModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function renderWaveVisualizerSVG(item) {
+      const box = document.getElementById('waveVisualizerBox');
+      const isBearish = item.trendBias === 'BEARISH';
+
+      // Koordinat titik gelombang (0 - 1 - 2 - 3 - 4 - 5 - A - B - C)
+      const pts = isBearish
+        ? [
+            { label: '0', x: 35, y: 35 },
+            { label: '1', x: 95, y: 95 },
+            { label: '2', x: 145, y: 65 },
+            { label: '3', x: 225, y: 155 },
+            { label: '4', x: 275, y: 120 },
+            { label: '5', x: 335, y: 175 },
+            { label: 'A', x: 390, y: 125 },
+            { label: 'B', x: 435, y: 150 },
+            { label: 'C', x: 490, y: 95 }
+          ]
+        : [
+            { label: '0', x: 35, y: 175 },
+            { label: '1', x: 95, y: 115 },
+            { label: '2', x: 145, y: 145 },
+            { label: '3', x: 225, y: 45 },
+            { label: '4', x: 275, y: 82 },
+            { label: '5', x: 335, y: 26 },
+            { label: 'A', x: 390, y: 85 },
+            { label: 'B', x: 435, y: 55 },
+            { label: 'C', x: 490, y: 112 }
+          ];
+
+      // Tentukan titik aktif berdasarkan posisi wave saat ini
+      let activeIdx = 3;
+      if (item.currentWave.includes('1')) activeIdx = 1;
+      else if (item.currentWave.includes('2')) activeIdx = 2;
+      else if (item.currentWave.includes('3')) activeIdx = 3;
+      else if (item.currentWave.includes('4')) activeIdx = 4;
+      else if (item.currentWave.includes('5')) activeIdx = 5;
+      else if (item.currentWave.includes('A')) activeIdx = 6;
+      else if (item.currentWave.includes('B')) activeIdx = 7;
+      else if (item.currentWave.includes('C')) activeIdx = 8;
+
+      const motivePoints = pts.slice(0, 6).map(p => `${p.x},${p.y}`).join(' ');
+      const corrPoints = pts.slice(5).map(p => `${p.x},${p.y}`).join(' ');
+      const activePt = pts[activeIdx];
+      const strokeMain = isBearish ? '#F43F5E' : '#10B981';
+
+      box.innerHTML = `
+        <svg viewBox="0 0 530 205" class="w-full h-full">
+          <!-- Fibonacci Horizontal Reference Lines -->
+          <line x1="20" y1="45" x2="510" y2="45" stroke="#F59E0B" stroke-opacity="0.25" stroke-dasharray="4 4" />
+          <text x="505" y="40" fill="#F59E0B" font-size="9" text-anchor="end" font-family="JetBrains Mono">Fib 161.8% (W3)</text>
+
+          <line x1="20" y1="115" x2="510" y2="115" stroke="#38BDF8" stroke-opacity="0.2" stroke-dasharray="3 3" />
+          <text x="505" y="110" fill="#38BDF8" font-size="9" text-anchor="end" font-family="JetBrains Mono">Fib 50.0% Retrace</text>
+
+          <line x1="20" y1="175" x2="510" y2="175" stroke="#F43F5E" stroke-opacity="0.25" stroke-dasharray="3 3" />
+          <text x="505" y="170" fill="#F43F5E" font-size="9" text-anchor="end" font-family="JetBrains Mono">Origin / Invalidation</text>
+
+          <!-- Motive Wave Path (0-1-2-3-4-5) -->
+          <polyline fill="none" stroke="${strokeMain}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" points="${motivePoints}" />
+
+          <!-- Corrective Wave Path (5-A-B-C) -->
+          <polyline fill="none" stroke="#A855F7" stroke-width="2.2" stroke-dasharray="5 4" stroke-linecap="round" stroke-linejoin="round" points="${corrPoints}" />
+
+          <!-- Wave Nodes & Labels -->
+          ${pts.map((p, i) => `
+            <circle cx="${p.x}" cy="${p.y}" r="${i === activeIdx ? 6 : 3.5}" fill="${i === activeIdx ? '#FBBF24' : i > 5 ? '#A855F7' : strokeMain}" />
+            <text x="${p.x}" y="${p.y - 10}" fill="${i === activeIdx ? '#FDE047' : '#CBD5E1'}" font-size="11" font-weight="bold" text-anchor="middle" font-family="JetBrains Mono">(${p.label})</text>
+          `).join('')}
+
+          <!-- Active Position Callout -->
+          <circle cx="${activePt.x}" cy="${activePt.y}" r="12" fill="none" stroke="#FBBF24" stroke-width="1.5" stroke-opacity="0.7" />
+        </svg>
+      `;
+    }
+
+    function recalculateLot() {
+      const capital = Math.max(0, Number(document.getElementById('calcCapital').value) || 0);
+      const riskPct = Math.max(0.1, Number(document.getElementById('calcRiskPct').value) || 2);
+      const entry = Math.max(1, Number(document.getElementById('calcEntry').value) || 1);
+      const sl = Math.max(1, Number(document.getElementById('calcSL').value) || 1);
+
+      const maxRiskRp = capital * (riskPct / 100);
+      const riskPerShare = Math.max(1, Math.abs(entry - sl));
+      const maxLotsByRisk = Math.floor(maxRiskRp / (riskPerShare * 100));
+      const maxLotsByCapital = Math.floor(capital / (entry * 100));
+      const finalLots = Math.max(0, Math.min(maxLotsByRisk, maxLotsByCapital));
+
+      const totalValue = finalLots * 100 * entry;
+      const actualRiskRp = finalLots * 100 * riskPerShare;
+
+      // Ambil target atas dari rentang Wave 3 jika tersedia
+      let targetW3Price = Math.round(entry * 1.25);
+      if (activeModalItem && activeModalItem.w3Range) {
+        const nums = activeModalItem.w3Range.replace(/\./g, '').match(/\d+/g);
+        if (nums && nums.length > 0) {
+          targetW3Price = Number(nums[nums.length - 1]);
+        }
+      }
+      const potentialGainRp = Math.max(0, finalLots * 100 * (targetW3Price - entry));
+
+      document.getElementById('calcResultLots').textContent = `${finalLots.toLocaleString('id-ID')} Lot`;
+      document.getElementById('calcResultValue').textContent = `Rp ${totalValue.toLocaleString('id-ID')}`;
+      document.getElementById('calcResultRiskRp').textContent = `-Rp ${actualRiskRp.toLocaleString('id-ID')}`;
+      document.getElementById('calcResultTargetW3').textContent = `+Rp ${potentialGainRp.toLocaleString('id-ID')}`;
+    }
+
+    // =========================================================================
+    // 11. INISIALISASI SAAT HALAMAN DIMUAT
+    // =========================================================================
+    window.addEventListener('DOMContentLoaded', () => {
+      if (localStorage.getItem('ewmatrix_logged_in') === 'true') {
+        enterDashboard();
+      }
+    });
   </script>
 </body>
 </html>
